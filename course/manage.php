@@ -6,13 +6,28 @@ if (strlen($_SESSION['alogin']) == "") {
     header("Location: ../index.php");
 } else {
     if (isset($_GET['id'])) {
-        $classid = $_GET['id'];
-        $sql = "DELETE FROM course WHERE id = :classid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':classid', $classid, PDO::PARAM_STR);
-        $query->execute();
-        echo '<script>alert("Course deleted successfully.");</script>';
+        $courseid = $_GET['id'];
+    
+        // Check if the course has allocated modules
+        $checkModulesSql = "SELECT COUNT(*) as module_count FROM module WHERE cid = :courseid";
+        $checkModulesQuery = $dbh->prepare($checkModulesSql);
+        $checkModulesQuery->bindParam(':courseid', $courseid, PDO::PARAM_STR);
+        $checkModulesQuery->execute();
+        $moduleCount = $checkModulesQuery->fetch(PDO::FETCH_OBJ)->module_count;
+    
+        if ($moduleCount > 0) {
+            // Show alert if the course has allocated modules
+            echo '<script>alert("Cannot delete this course as it has allocated modules.");</script>';
+        } else {
+            // Proceed with deletion if no modules are allocated
+            $sql = "DELETE FROM course WHERE id = :courseid";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':courseid', $courseid, PDO::PARAM_STR);
+            $query->execute();
+            echo '<script>alert("Course deleted successfully.");</script>';
+        }
     }
+    
 ?>
     <!DOCTYPE html>
     <html lang="en">

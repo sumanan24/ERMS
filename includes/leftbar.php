@@ -40,55 +40,27 @@
                 </li>
 
                 <li class="has-children">
-                    <a href="#"><i class="fa fa-file-text"></i> <span>Student Classes</span> <i class="fa fa-angle-right arrow"></i></a>
+                    <a href="#"><i class="fa fa-file"></i> <span>Module</span> <i class="fa fa-angle-right arrow"></i></a>
                     <ul class="child-nav">
-                        <li><a href="create-class.php"><i class="fa fa-bars"></i> <span>Create Class</span></a></li>
-                        <li><a href="manage-classes.php"><i class="fa fa fa-server"></i> <span>Manage Classes</span></a></li>
+                        <li><a href="../module/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
+                        <li><a href="../module/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
 
                     </ul>
                 </li>
+
                 <li class="has-children">
-                    <a href="#"><i class="fa fa-file-text"></i> <span>Subjects</span> <i class="fa fa-angle-right arrow"></i></a>
+                    <a href="#"><i class="fa fa-graduation-cap"></i> <span>Student</span> <i class="fa fa-angle-right arrow"></i></a>
                     <ul class="child-nav">
-                        <li><a href="create-subject.php"><i class="fa fa-bars"></i> <span>Create Subject</span></a></li>
-                        <li><a href="manage-subjects.php"><i class="fa fa fa-server"></i> <span>Manage Subjects</span></a></li>
-                        <li><a href="add-subjectcombination.php"><i class="fa fa-newspaper-o"></i> <span>Add Subject Combination </span></a></li>
-                        <a href="manage-subjectcombination.php"><i class="fa fa-newspaper-o"></i> <span>Manage Subject Combination </span></a>
+                        <li><a href="../module/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
+                        <li><a href="../module/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
+
+                    </ul>
                 </li>
+
+                
+                
             </ul>
-            </li>
-            <li class="has-children">
-                <a href="#"><i class="fa fa-users"></i> <span>Students</span> <i class="fa fa-angle-right arrow"></i></a>
-                <ul class="child-nav">
-                    <li><a href="add-students.php"><i class="fa fa-bars"></i> <span>Add Students</span></a></li>
-                    <li><a href="manage-students.php"><i class="fa fa fa-server"></i> <span>Manage Students</span></a></li>
-
-                </ul>
-            </li>
-            <li class="has-children">
-                <a href="#"><i class="fa fa-info-circle"></i> <span>Result</span> <i class="fa fa-angle-right arrow"></i></a>
-                <ul class="child-nav">
-                    <li><a href="add-result.php"><i class="fa fa-bars"></i> <span>Add Result</span></a></li>
-                    <li><a href="manage-results.php"><i class="fa fa fa-server"></i> <span>Manage Result</span></a></li>
-
-                </ul>
-            </li>
-
-
-            <li class="has-children">
-                <a href="#"><i class="fa fa-bell"></i> <span>Notices</span> <i class="fa fa-angle-right arrow"></i></a>
-                <ul class="child-nav">
-                    <li><a href="add-notice.php"><i class="fa fa-bars"></i> <span>Add Notice</span></a></li>
-                    <li><a href="manage-notices.php"><i class="fa fa fa-server"></i> <span>Manage Notices</span></a></li>
-
-                </ul>
-            </li>
-
-
-
-            <li><a href="change-password.php"><i class="fa fa fa-server"></i> <span> Admin Change Password</span></a></li>
-
-
+            
         </div>
         <!-- /.sidebar-nav -->
     </div>
