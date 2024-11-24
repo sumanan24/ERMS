@@ -13,12 +13,14 @@ if (strlen($_SESSION['alogin']) == 0) {
         $mcode = $_POST['mcode'];
         $mname = $_POST['mname'];
         $cid = $_POST['cid'];
+        $semester = $_POST['semester'];
 
-        $sql = "UPDATE module SET mcode = :mcode, mname = :mname, cid = :cid WHERE id = :moduleid";
+        $sql = "UPDATE module SET mcode = :mcode, mname = :mname, cid = :cid, semester = :semester WHERE id = :moduleid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':mcode', $mcode, PDO::PARAM_STR);
         $query->bindParam(':mname', $mname, PDO::PARAM_STR);
         $query->bindParam(':cid', $cid, PDO::PARAM_INT);
+        $query->bindParam(':semester', $semester, PDO::PARAM_INT);
         $query->bindParam(':moduleid', $moduleid, PDO::PARAM_INT);
         $query->execute();
 
@@ -98,13 +100,14 @@ if (strlen($_SESSION['alogin']) == 0) {
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" role="alert">
                                                     <strong>Well done!</strong> <?php echo htmlentities($msg); ?>
+                                                    <meta http-equiv='refresh' content='1.5'>
                                                 </div>
                                             <?php } ?>
                                             <div class="panel-body">
                                                 <form method="post">
                                                     <div class="form-group">
                                                         <label for="department">Department</label>
-                                                        <select class="form-control" id="department" >
+                                                        <select class="form-control" id="department">
                                                             <option value="">Select Department</option>
                                                             <?php foreach ($departments as $dept) { ?>
                                                                 <option value="<?php echo htmlentities($dept->id); ?>" <?php echo ($dept->id == $module->did) ? 'selected' : ''; ?>>
@@ -132,6 +135,17 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                         <label for="mname">Module Name</label>
                                                         <input type="text" name="mname" class="form-control" value="<?php echo htmlentities($module->mname); ?>" required>
                                                     </div>
+
+                                                    <div class="form-group">
+                                                        <label for="semester">Semester</label>
+                                                        <select name="semester" class="form-control" required>
+                                                            <option value="" disabled>Select Semester</option>
+                                                            <?php for ($i = 1; $i <= 6; $i++) { ?>
+                                                                <option value="<?php echo $i; ?>" <?php echo ($i == $module->Semester) ? 'selected' : ''; ?>><?php echo "Semester " . $i; ?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                    </div>
+
                                                     <div class="form-group">
                                                         <button type="submit" name="update" class="btn btn-primary">Update</button>
                                                     </div>

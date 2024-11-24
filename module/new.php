@@ -10,12 +10,14 @@ if (strlen($_SESSION['alogin']) == 0) {
         $mcode = $_POST['mcode'];
         $mname = $_POST['mname'];
         $cid = $_POST['cid'];
+        $semester = $_POST['semester']; // Get the selected semester
 
-        $sql = "INSERT INTO module(mcode, mname, cid) VALUES(:mcode, :mname, :cid)";
+        $sql = "INSERT INTO module(mcode, mname, cid, semester) VALUES(:mcode, :mname, :cid, :semester)";
         $query = $dbh->prepare($sql);
         $query->bindParam(':mcode', $mcode, PDO::PARAM_STR);
         $query->bindParam(':mname', $mname, PDO::PARAM_STR);
         $query->bindParam(':cid', $cid, PDO::PARAM_INT);
+        $query->bindParam(':semester', $semester, PDO::PARAM_INT);
         $query->execute();
         $lastInsertId = $dbh->lastInsertId();
 
@@ -26,12 +28,12 @@ if (strlen($_SESSION['alogin']) == 0) {
         }
     }
 
-    // Fetch departments for the first dropdown
     $deptSql = "SELECT * FROM department";
     $deptQuery = $dbh->prepare($deptSql);
     $deptQuery->execute();
     $departments = $deptQuery->fetchAll(PDO::FETCH_OBJ);
 ?>
+
     <!DOCTYPE html>
     <html lang="en">
 
@@ -89,6 +91,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 </div>
                             </div>
                         </div>
+
+
+
+
+
                         <section class="section">
                             <div class="container-fluid">
                                 <div class="row">
@@ -99,6 +106,73 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     <h5>Module</h5>
                                                 </div>
                                             </div>
+
+                                            <!-- Trigger the Modal -->
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#excelModal" style="margin-left: 15px;">
+                                                Upload Modules via Excel
+                                            </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="excelModalLabel">Upload Modules via Excel</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <form action="upload_excel.php" method="post" enctype="multipart/form-data">
+                                                            <div class="modal-body">
+                                                                <div class="form-group">
+                                                                    <label for="department">Department</label>
+                                                                    <select name="department_id" id="department" class="form-control" required>
+                                                                        <option value="">Select Department</option>
+                                                                        <?php foreach ($departments as $dept) { ?>
+                                                                            <option value="<?php echo htmlentities($dept->id); ?>">
+                                                                                <?php echo htmlentities($dept->dname); ?>
+                                                                            </option>
+                                                                        <?php } ?>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="course">Course</label>
+                                                                    <select name="course_id" id="course" class="form-control" required>
+                                                                        <option value="">Select Course</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="excelFile">Excel File</label>
+                                                                    <input type="file" name="excelFile" class="form-control" id="excelFile" accept=".xls, .xlsx" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <a href="Module.xlsx" ><u>Sample Excel File Click here</u></a>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <button type="submit" class="btn btn-success">Upload</button>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <?php if (isset($_SESSION['success'])) { ?>
+                                                <div class="alert alert-success">
+                                                    <?php echo htmlentities($_SESSION['success']);
+                                                    unset($_SESSION['success']); ?>
+                                                </div>
+                                                <meta http-equiv='refresh' content='1.5'>
+                                            <?php } else if (isset($_SESSION['error'])) { ?>
+                                                <div class="alert alert-danger">
+                                                    <?php echo htmlentities($_SESSION['error']);
+                                                    unset($_SESSION['error']); ?>
+                                                </div>
+                                            <?php } ?>
+
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" role="alert">
                                                     <strong>Well done!</strong> <?php echo htmlentities($msg); ?>
@@ -135,6 +209,19 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     <div class="form-group">
                                                         <label for="mname">Module Name</label>
                                                         <input type="text" name="mname" class="form-control" required>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="semester">Semester</label>
+                                                        <select name="semester" class="form-control" id="semester" required>
+                                                            <option value="" disabled selected>Select Semester</option>
+                                                            <option value="1">Semester 1</option>
+                                                            <option value="2">Semester 2</option>
+                                                            <option value="3">Semester 3</option>
+                                                            <option value="4">Semester 4</option>
+                                                            <option value="5">Semester 5</option>
+                                                            <option value="6">Semester 6</option>
+                                                        </select>
                                                     </div>
                                                     <div class="form-group">
                                                         <button type="submit" name="submit" class="btn btn-success">Submit</button>
