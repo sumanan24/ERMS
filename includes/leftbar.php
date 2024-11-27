@@ -49,10 +49,10 @@
                 </li>
 
                 <li class="has-children">
-                    <a href="#"><i class="fa fa-graduation-cap"></i> <span>Student</span> <i class="fa fa-angle-right arrow"></i></a>
+                    <a href="#"><i class="fa fa-graduation-cap"></i> <span>Batch</span> <i class="fa fa-angle-right arrow"></i></a>
                     <ul class="child-nav">
-                        <li><a href="../module/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
-                        <li><a href="../module/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
+                        <li><a href="../batch/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
+                        <li><a href="../batch/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
 
                     </ul>
                 </li>

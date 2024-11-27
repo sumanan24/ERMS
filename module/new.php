@@ -146,7 +146,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                     <input type="file" name="excelFile" class="form-control" id="excelFile" accept=".xls, .xlsx" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <a href="Module.xlsx" ><u>Sample Excel File Click here</u></a>
+                                                                    <a href="Module.xlsx"><u>Sample Excel File Click here</u></a>
                                                                 </div>
                                                             </div>
 
@@ -187,7 +187,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 <form method="post">
                                                     <div class="form-group">
                                                         <label for="department">Department</label>
-                                                        <select class="form-control" id="department" required>
+                                                        <select class="form-control" id="department1" required>
                                                             <option value="">Select Department</option>
                                                             <?php foreach ($departments as $dept) { ?>
                                                                 <option value="<?php echo htmlentities($dept->id); ?>">
@@ -198,7 +198,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="course">Course</label>
-                                                        <select name="cid" class="form-control" id="course" required>
+                                                        <select name="cid" class="form-control" id="course1" required>
                                                             <option value="">Select Course</option>
                                                         </select>
                                                     </div>
@@ -245,6 +245,34 @@ if (strlen($_SESSION['alogin']) == 0) {
         <script src="../js/iscroll/iscroll.js"></script>
         <script src="../js/prism/prism.js"></script>
         <script src="../js/main.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#department1').change(function() {
+                    var deptId = $(this).val();
+                    if (deptId) {
+                        $.ajax({
+                            url: 'get_courses.php',
+                            method: 'POST',
+                            data: {
+                                department_id: deptId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                $('#course1').html('<option value="">Select Course</option>');
+                                $.each(data, function(key, value) {
+                                    $('#course1').append('<option value="' + value.id + '">' + value.cname + '</option>');
+                                });
+                            }
+                        });
+                    } else {
+                        $('#course1').html('<option value="">Select Course</option>');
+                    }
+                });
+            });
+        </script>
+
+
+
         <script>
             $(document).ready(function() {
                 $('#department').change(function() {
