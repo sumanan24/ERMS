@@ -49,11 +49,26 @@
                 </li>
 
                 <li class="has-children">
-                    <a href="#"><i class="fa fa-graduation-cap"></i> <span>Batch</span> <i class="fa fa-angle-right arrow"></i></a>
+                    <a href="#"><i class="fa fa-child"></i> <span>Batch</span> <i class="fa fa-angle-right arrow"></i></a>
                     <ul class="child-nav">
                         <li><a href="../batch/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
                         <li><a href="../batch/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
+                    </ul>
+                </li>
 
+                <li class="has-children">
+                    <a href="#"><i class="fa fa-users"></i> <span>Students</span> <i class="fa fa-angle-right arrow"></i></a>
+                    <ul class="child-nav">
+                        <li><a href="../student/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
+                        <li><a href="../student/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
+                    </ul>
+                </li>
+
+                <li class="has-children">
+                    <a href="#"><i class="fa fa-graduation-cap"></i> <span>Exam Schedules</span> <i class="fa fa-angle-right arrow"></i></a>
+                    <ul class="child-nav">
+                        <li><a href="../exams/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
+                        <li><a href="../exams/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
                     </ul>
                 </li>
 
