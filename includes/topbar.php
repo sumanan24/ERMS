@@ -3,7 +3,7 @@
                     <div class="row">
                         <div class="navbar-header no-padding">
                 			<a class="navbar-brand" href="dashboard.php">
-                			    SRMS | Admin
+                			    University Colloge | Admin
                 			</a>
                             <span class="small-nav-handle hidden-sm hidden-xs"><i class="fa fa-outdent"></i></span>
                 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">

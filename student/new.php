@@ -93,11 +93,16 @@ if (strlen($_SESSION['alogin']) == 0) {
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-md-8 col-md-offset-2">
+                                   
                                         <div class="panel">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
                                                     <h5>Student</h5>
                                                 </div>
+                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#excelModal" style="margin-left: 15px;">
+                                                Upload Students via Excel
+                                            </button>
+                                            <br>
                                             </div>
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" aria-label="Close" role="alert">

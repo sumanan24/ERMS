@@ -212,6 +212,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     </div>
 
                                                     <div class="form-group">
+                                                        <label for="mname">Module Credit</label>
+                                                        <input type="text" name="credit" class="form-control" required>
+                                                    </div>
+
+                                                    <div class="form-group">
                                                         <label for="semester">Semester</label>
                                                         <select name="semester" class="form-control" id="semester" required>
                                                             <option value="" disabled selected>Select Semester</option>
