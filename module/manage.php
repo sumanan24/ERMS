@@ -93,7 +93,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                 <table id="moduleTable" class="display table table-striped table-bordered" cellspacing="0" width="100%">
                                                     <thead>
                                                         <tr>
-                                                            <th>#</th>
+                                                            <th></th>
                                                             <th>Module Code</th>
                                                             <th>Module Name</th>
                                                             <th>Action</th>

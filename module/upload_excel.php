@@ -23,14 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mcode = $row[0]; // Module Code
                 $mname = $row[1]; // Module Name
                 $semester = $row[2]; // Semester
+                $credit=$row[3];//credit
 
                 if ($mcode && $mname && $semester) {
-                    $sql = "INSERT INTO module (mcode, mname, cid, semester) VALUES (:mcode, :mname, :cid, :semester)";
+                    $sql = "INSERT INTO module (mcode, mname, cid, semester,credit) VALUES (:mcode, :mname, :cid, :semester, :credit)";
                     $query = $dbh->prepare($sql);
                     $query->bindParam(':mcode', $mcode, PDO::PARAM_STR);
                     $query->bindParam(':mname', $mname, PDO::PARAM_STR);
                     $query->bindParam(':cid', $courseId, PDO::PARAM_INT);
                     $query->bindParam(':semester', $semester, PDO::PARAM_INT);
+                    $query->bindParam(':credit', $credit, PDO::PARAM_INT);
                     $query->execute();
                     $insertedCount++;
                 }
