@@ -13,7 +13,7 @@
                     <span class="">Main Category</span>
                 </li>
                 <li>
-                    <a href="dashboard.php"><i class="fa fa-dashboard"></i> <span>Dashboard</span> </a>
+                    <a href="../dashboard/dashboard.php"><i class="fa fa-dashboard"></i> <span>Dashboard</span> </a>
 
                 </li>
 

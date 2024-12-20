@@ -77,16 +77,18 @@ if (strlen($_SESSION['alogin']) == "") {
                     <div class="main-page">
                         <div class="container-fluid">
                             <div class="row page-title-div">
-                                <div class="col-md-6">
+                                <div class="col-md-10">
                                     <h2 class="title">Manage Departments</h2>
+                                </div>
+                                <div class="col-md-2">
+                                <a href="new.php" class="btn btn-primary">New Department</a>
                                 </div>
                             </div>
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li>Departments</li>
-                                        <li class="active">Manage Departments</li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li class="active">Departments</li>
                                     </ul>
                                 </div>
                             </div>

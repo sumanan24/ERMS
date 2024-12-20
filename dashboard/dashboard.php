@@ -6,7 +6,17 @@ include('../includes/config.php');
 if (strlen($_SESSION['alogin']) == 0) {
     header("Location: index.php");
 } else {
-    
+    // Fetch total counts
+    $departmentCount = $dbh->query("SELECT COUNT(*) FROM department")->fetchColumn();
+    $courseCount = $dbh->query("SELECT COUNT(*) FROM course")->fetchColumn();
+    $studentCount = $dbh->query("SELECT COUNT(*) FROM student")->fetchColumn();
+    $examCount = $dbh->query("SELECT COUNT(*) FROM exam")->fetchColumn();
+    $batchCount = $dbh->query("SELECT COUNT(*) FROM batch")->fetchColumn();
+
+    // Fetch pass rates department and course-wise
+    $passRates = $dbh->query(
+        "SELECT d.dname, c.cname, ROUND(SUM(CASE WHEN r.marks >= 40 THEN 1 ELSE 0 END) * 100.0 / COUNT(r.id), 2) as pass_rate FROM results r JOIN exam e ON r.examid = e.id JOIN module m ON e.mid=m.id JOIN course c ON m.cid = c.id JOIN department d ON c.did = d.id GROUP BY d.dname, c.cname;"
+    )->fetchAll(PDO::FETCH_OBJ);
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -14,7 +24,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Admin Batch Management</title>
+        <title>Admin Dashboard</title>
         <link rel="stylesheet" href="../css/bootstrap.css" media="screen">
         <link rel="stylesheet" href="../css/font-awesome.min.css" media="screen">
         <link rel="stylesheet" href="../css/animate-css/animate.min.css" media="screen">
@@ -38,7 +48,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                 border-left: 4px solid #5cb85c;
                 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
             }
-
         </style>
     </head>
 
@@ -59,8 +68,6 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
                                         <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                      
-                                        
                                     </ul>
                                 </div>
                             </div>
@@ -68,9 +75,68 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <section class="section">
                             <div class="container-fluid">
                                 <div class="row">
-                                    <div class="col-md-8 col-md-offset-2">
+                                    <div class="col-md-12">
                                         <div class="panel">
-
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Overview</h3>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <div class="alert alert-info text-center">
+                                                            <strong>Departments</strong><br>
+                                                            <?php echo $departmentCount; ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="alert alert-success text-center">
+                                                            <strong>Courses</strong><br>
+                                                            <?php echo $courseCount; ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="alert alert-warning text-center">
+                                                            <strong>Students</strong><br>
+                                                            <?php echo $studentCount; ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="alert alert-danger text-center">
+                                                            <strong>Exams</strong><br>
+                                                            <?php echo $examCount; ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="alert text-center" style="background-color: #5cb85c; "> 
+                                                            <strong>Batches</strong><br>
+                                                            <?php echo $batchCount; ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h3 class="text-center">Pass Rates (Department and Course-wise)</h3>
+                                                        <table class="table table-bordered table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Department</th>
+                                                                    <th>Course</th>
+                                                                    <th>Pass Rate (%)</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($passRates as $rate) { ?>
+                                                                    <tr>
+                                                                        <td><?php echo htmlentities($rate->dname); ?></td>
+                                                                        <td><?php echo htmlentities($rate->cname); ?></td>
+                                                                        <td><?php echo htmlentities($rate->pass_rate); ?>%</td>
+                                                                    </tr>
+                                                                <?php } ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -88,46 +154,6 @@ if (strlen($_SESSION['alogin']) == 0) {
         <script src="../js/iscroll/iscroll.js"></script>
         <script src="../js/prism/prism.js"></script>
         <script src="../js/main.js"></script>
-        <script>
-            // Fetch courses based on selected department
-            $('#department').change(function() {
-                var department_id = $(this).val();
-                if (department_id) {
-                    $.ajax({
-                        url: 'get_courses.php',
-                        method: 'POST',
-                        data: {
-                            department_id: department_id
-                        },
-                        success: function(data) {
-                            $('#course').html(data);
-                            // Reset batch number field
-                            $('#batch_no').val('');
-                        }
-                    });
-                } else {
-                    $('#course').html('<option value="">Select Course</option>');
-                }
-            });
-
-            // Fetch max batch_no for the selected course and generate next batch_no
-            $('#course').change(function() {
-                var course_id = $(this).val();
-                if (course_id) {
-                    $.ajax({
-                        url: 'get_batch_no.php',
-                        method: 'POST',
-                        data: {
-                            course_id: course_id
-                        },
-                        success: function(data) {
-                            var batch_no = parseInt(data) + 1;
-                            $('#batch_no').val(batch_no);
-                        }
-                    });
-                }
-            });
-        </script>
     </body>
 
     </html>

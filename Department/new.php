@@ -72,8 +72,8 @@ if (strlen($_SESSION['alogin']) == 0) { // Ensures session is valid
                         <div class="row breadcrumb-div">
                             <div class="col-md-6">
                                 <ul class="breadcrumb">
-                                    <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                    <li><a href="#">Departments</a></li>
+                                    <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                    <li><a href="manage.php">Departments</a></li>
                                     <li class="active">Create Department</li>
                                 </ul>
                             </div>

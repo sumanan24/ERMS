@@ -84,8 +84,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li><a href="#">Modules</a></li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li><a href="manage.php">Modules</a></li>
                                         <li class="active">Create Module</li>
                                     </ul>
                                 </div>
@@ -213,7 +213,7 @@ if (strlen($_SESSION['alogin']) == 0) {
 
                                                     <div class="form-group">
                                                         <label for="mname">Module Credit</label>
-                                                        <input type="text" name="credit" class="form-control" required>
+                                                        <input type="number" name="credit" class="form-control" required>
                                                     </div>
 
                                                     <div class="form-group">

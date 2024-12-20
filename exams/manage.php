@@ -29,6 +29,44 @@ if (strlen($_SESSION['alogin']) == "") {
             echo '<script>alert("Exam deleted successfully.");</script>';
         }
     }
+
+    // Fetch filters
+    $courseFilter = isset($_POST['course']) ? $_POST['course'] : '';
+    $batchFilter = isset($_POST['batch']) ? $_POST['batch'] : '';
+
+    // Build SQL query based on filters
+    $sql = "SELECT e.id, e.date, m.mname as module_name, b.batch_no, c.cname as course_name,
+                (SELECT COUNT(*) FROM results r WHERE r.examid = e.id) as total_students,
+                (SELECT COUNT(*) FROM results r WHERE r.examid = e.id AND r.marks > 40) as above_40
+            FROM exam e
+            JOIN module m ON e.mid = m.id
+            JOIN batch b ON e.bid = b.id
+            JOIN course c ON b.cid = c.id";
+
+    $conditions = [];
+    if ($courseFilter) {
+        $conditions[] = "c.id = :course";
+    }
+    if ($batchFilter) {
+        $conditions[] = "b.id = :batch";
+    }
+
+    if (count($conditions) > 0) {
+        $sql .= " WHERE " . implode(" AND ", $conditions);
+    }
+
+    $query = $dbh->prepare($sql);
+
+    if ($courseFilter) {
+        $query->bindParam(':course', $courseFilter, PDO::PARAM_STR);
+    }
+    if ($batchFilter) {
+        $query->bindParam(':batch', $batchFilter, PDO::PARAM_STR);
+    }
+
+    $query->execute();
+    $results = $query->fetchAll(PDO::FETCH_OBJ);
+
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -96,60 +134,120 @@ if (strlen($_SESSION['alogin']) == "") {
                                         <div class="panel">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
+                                                    <h5>Filter Exams</h5>
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                                <form method="POST">
+                                                    <div class="row">
+                                                        <div class="col-sm-5">
+                                                            <div class="form-group">
+                                                                <label for="course">Course</label>
+                                                                <select name="course" id="course" class="form-control">
+                                                                    <option value="">Select Course</option>
+                                                                    <?php
+                                                                    $courseSql = "SELECT id, cname FROM course";
+                                                                    $courseQuery = $dbh->prepare($courseSql);
+                                                                    $courseQuery->execute();
+                                                                    $courses = $courseQuery->fetchAll(PDO::FETCH_OBJ);
+                                                                    foreach ($courses as $course) {
+                                                                        echo '<option value="' . $course->id . '">' . $course->cname . '</option>';
+                                                                    }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-sm-5">
+                                                            <div class="form-group">
+                                                                <label for="batch">Batch</label>
+                                                                <select name="batch" id="batch" class="form-control">
+                                                                    <option value="">Select Batch</option>
+                                                                    <?php
+                                                                    $batchSql = "SELECT id, batch_no FROM batch";
+                                                                    $batchQuery = $dbh->prepare($batchSql);
+                                                                    $batchQuery->execute();
+                                                                    $batches = $batchQuery->fetchAll(PDO::FETCH_OBJ);
+                                                                    foreach ($batches as $batch) {
+                                                                        echo '<option value="' . $batch->id . '">' . $batch->batch_no . '</option>';
+                                                                    }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-sm-2">
+                                                            <br><button type="submit" class="btn btn-primary" style="width: 100%;">Search Exam</button>
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="panel">
+                                            <div class="panel-heading">
+                                                <div class="panel-title">
                                                     <h5>View Exams Info</h5>
                                                 </div>
                                             </div>
-                                            <?php if ($msg) { ?>
-                                                <div class="alert alert-success left-icon-alert" role="alert">
-                                                    <strong>Well done!</strong><?php echo htmlentities($msg); ?>
-                                                </div><?php } else if ($error) { ?>
-                                                <div class="alert alert-danger left-icon-alert" role="alert">
-                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
-                                                </div>
-                                            <?php } ?>
                                             <div class="panel-body p-20">
                                                 <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
                                                     <thead>
                                                         <tr>
-                                                        <th>Module Name</th>
+
+                                                            <th>Module Name</th>
                                                             <th>Batch No</th>
                                                             <th>Date</th>
+                                                            <th>Total Students</th>
+                                                            <th>Above 40</th>
+                                                            <th>Percentage Above 40</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tfoot>
                                                         <tr>
+
                                                             <th>Module Name</th>
                                                             <th>Batch No</th>
                                                             <th>Date</th>
+                                                            <th>Total Students</th>
+                                                            <th>Above 40</th>
+                                                            <th>Percentage Above 40</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </tfoot>
                                                     <tbody>
                                                         <?php
-                                                        $sql = "SELECT e.id, e.date, m.mname as module_name, b.batch_no
-                                                                FROM exam e
-                                                                JOIN module m ON e.mid = m.id
-                                                                JOIN batch b ON e.bid = b.id";
-                                                        $query = $dbh->prepare($sql);
-                                                        $query->execute();
-                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                        $cnt = 1;
                                                         if ($query->rowCount() > 0) {
-                                                            foreach ($results as $result) {   ?>
+                                                            foreach ($results as $result) {
+                                                                $percentage = ($result->total_students > 0) ? round(($result->above_40 / $result->total_students) * 100, 2) : 0;
+                                                        ?>
                                                                 <tr>
+
                                                                     <td><?php echo htmlentities($result->module_name); ?></td>
                                                                     <td><?php echo htmlentities($result->batch_no); ?></td>
                                                                     <td><?php echo htmlentities($result->date); ?></td>
+                                                                    <td><?php echo htmlentities($result->total_students); ?></td>
+                                                                    <td><?php echo htmlentities($result->above_40); ?></td>
+                                                                    <td>
+                                                                        <div class="progress">
+                                                                            <div class="progress-bar" role="progressbar" aria-valuenow="<?php echo $percentage; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $percentage; ?>%;">
+                                                                                <?php echo $percentage; ?>%
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
                                                                     <td>
                                                                         <a href="edit.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Edit </a>
                                                                         <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
                                                                         <a href="result.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Add Result </a>
                                                                     </td>
                                                                 </tr>
-                                                        <?php $cnt = $cnt + 1;
+                                                        <?php
                                                             }
-                                                        } ?>
+                                                        }
+                                                        ?>
                                                     </tbody>
                                                 </table>
                                             </div>

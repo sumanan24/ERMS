@@ -14,13 +14,15 @@ if (strlen($_SESSION['alogin']) == 0) {
         $mname = $_POST['mname'];
         $cid = $_POST['cid'];
         $semester = $_POST['semester'];
+        $credit=$_POST['credit'];
 
-        $sql = "UPDATE module SET mcode = :mcode, mname = :mname, cid = :cid, semester = :semester WHERE id = :moduleid";
+        $sql = "UPDATE module SET mcode = :mcode, mname = :mname, cid = :cid, semester = :semester, credit =:credit WHERE id = :moduleid";
         $query = $dbh->prepare($sql);
         $query->bindParam(':mcode', $mcode, PDO::PARAM_STR);
         $query->bindParam(':mname', $mname, PDO::PARAM_STR);
         $query->bindParam(':cid', $cid, PDO::PARAM_INT);
         $query->bindParam(':semester', $semester, PDO::PARAM_INT);
+        $query->bindParam(':credit', $credit, PDO::PARAM_INT);
         $query->bindParam(':moduleid', $moduleid, PDO::PARAM_INT);
         $query->execute();
 
@@ -80,8 +82,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li><a href="#">Modules</a></li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li><a href="manage.php">Modules</a></li>
                                         <li class="active">Update Module</li>
                                     </ul>
                                 </div>
@@ -134,6 +136,11 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     <div class="form-group">
                                                         <label for="mname">Module Name</label>
                                                         <input type="text" name="mname" class="form-control" value="<?php echo htmlentities($module->mname); ?>" required>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="mname">Module Credit</label>
+                                                        <input type="number" name="credit" class="form-control" value="<?php echo htmlentities($module->credit); ?>" required>
                                                     </div>
 
                                                     <div class="form-group">
