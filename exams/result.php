@@ -36,7 +36,9 @@ if (strlen($_SESSION['alogin']) == "") {
             FROM student s
             JOIN batch b ON s.bid = b.batch_no
             LEFT JOIN results r ON r.studentid = s.id AND r.examid = :examid
-            WHERE b.id = (SELECT bid FROM exam WHERE id = :examid)";
+            WHERE b.id = (SELECT bid FROM exam WHERE id = :examid)
+            ORDER BY s.id
+            ";
     $query = $dbh->prepare($sql);
     $query->bindParam(':examid', $examid, PDO::PARAM_INT);
     $query->execute();
@@ -133,8 +135,8 @@ if (strlen($_SESSION['alogin']) == "") {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li>Results</li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li><a href="manage.php">Exams</a></li>
                                         <li class="active">Manage Results</li>
                                     </ul>
                                 </div>
@@ -155,6 +157,7 @@ if (strlen($_SESSION['alogin']) == "") {
 
                                                     <?php if (isset($msg)) { ?>
                                                         <div class="alert alert-success"><?php echo $msg; ?></div>
+                                                        
                                                     <?php } ?>
 
                                                     <div class="card">

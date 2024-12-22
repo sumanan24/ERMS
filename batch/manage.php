@@ -92,7 +92,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                             <th>Batch Number</th>
                                                             <th>Start Date</th>
                                                             <th>End Date</th>
-                                                            <th>Course ID</th>
+                                                            <th>Course Name</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
@@ -101,13 +101,14 @@ if (strlen($_SESSION['alogin']) == "") {
                                                             <th>Batch Number</th>
                                                             <th>Start Date</th>
                                                             <th>End Date</th>
-                                                            <th>Course ID</th>
+                                                            <th>Course Name</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </tfoot>
                                                     <tbody>
                                                         <?php
-                                                        $sql = "SELECT * FROM batch";
+                                                        $sql = "SELECT batch.*, course.cname FROM batch 
+                                                                JOIN course ON batch.cid = course.id";
                                                         $query = $dbh->prepare($sql);
                                                         $query->execute();
                                                         $results = $query->fetchAll(PDO::FETCH_OBJ);
@@ -117,7 +118,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     <td><?php echo htmlentities($result->batch_no); ?></td>
                                                                     <td><?php echo htmlentities($result->Start_date); ?></td>
                                                                     <td><?php echo htmlentities($result->End_date); ?></td>
-                                                                    <td><?php echo htmlentities($result->cid); ?></td>
+                                                                    <td><?php echo htmlentities($result->cname); ?></td>
                                                                     <td>
                                                                         <a href="edit.php?batchid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Edit </a>
                                                                         <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>

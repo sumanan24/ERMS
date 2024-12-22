@@ -12,11 +12,11 @@ if (strlen($_SESSION['alogin']) == 0) {
         $dates = $_POST['date']; // Array of dates
         $times = $_POST['time']; // Array of times
 
-        $sql = "INSERT INTO exam(mid, bid, date, time) VALUES(:moduleId, :batchId, :examDate, :examTime)";
+        $sql = "INSERT INTO exam(mid, bid, date, time,Status) VALUES(:moduleId, :batchId, :examDate, :examTime,'Pending')";
         $query = $dbh->prepare($sql);
 
         foreach ($modules as $key => $moduleId) {
-            $examDate = $dates[$key];
+            $examDate = date('Y-m-d', strtotime($dates[$key])); // Ensure correct format
             $examTime = $times[$key];
             $query->bindParam(':moduleId', $moduleId, PDO::PARAM_INT);
             $query->bindParam(':batchId', $batchId, PDO::PARAM_INT);
@@ -26,6 +26,7 @@ if (strlen($_SESSION['alogin']) == 0) {
         }
         $msg = "Exam schedule created successfully!";
     }
+
 ?>
 
 
@@ -81,8 +82,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li><a href="#">Exam Schedules</a></li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li><a href="manage.php">Exam Schedules</a></li>
                                         <li class="active">Create Exam Schedule</li>
                                     </ul>
                                 </div>
@@ -136,6 +137,19 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     </div>
 
                                                     <div class="form-group">
+                                                        <label for="semester">Select Semester</label>
+                                                        <select name="semester" id="semester" class="form-control" required>
+                                                            <option value="">Select Semester</option>
+                                                            <!-- Semesters can be hardcoded or fetched dynamically from the database -->
+                                                            <option value="1">Semester 1</option>
+                                                            <option value="2">Semester 2</option>
+                                                            <option value="3">Semester 3</option>
+                                                            <option value="4">Semester 4</option>
+                                                        </select>
+                                                    </div>
+
+
+                                                    <div class="form-group">
                                                         <label for="batch">Select Batch</label>
                                                         <select name="batch" id="batch" class="form-control" required>
                                                             <option value="">Select Batch</option>
@@ -184,12 +198,14 @@ if (strlen($_SESSION['alogin']) == 0) {
                                 $('#course').html(data);
                                 $('#batch').html('<option value="">Select Batch</option>');
                                 $('#module-table tbody').empty(); // Clear modules table
+                                $('#semester').val(''); // Reset semester
                             }
                         });
                     } else {
                         $('#course').html('<option value="">Select Course</option>');
                         $('#batch').html('<option value="">Select Batch</option>');
                         $('#module-table tbody').empty();
+                        $('#semester').val(''); // Reset semester
                     }
                 });
 
@@ -205,28 +221,37 @@ if (strlen($_SESSION['alogin']) == 0) {
                             },
                             success: function(data) {
                                 $('#batch').html(data);
-                                loadModules(courseId); // Load modules when course changes
+                                $('#module-table tbody').empty(); // Clear modules table
+                                $('#semester').val(''); // Reset semester
                             }
                         });
                     } else {
                         $('#batch').html('<option value="">Select Batch</option>');
                         $('#module-table tbody').empty();
+                        $('#semester').val(''); // Reset semester
                     }
                 });
 
-                // Load modules based on course
-                function loadModules(courseId) {
-                    $.ajax({
-                        url: "get_modules.php",
-                        method: "POST",
-                        data: {
-                            courseId: courseId
-                        },
-                        success: function(data) {
-                            $('#module-table tbody').html(data);
-                        }
-                    });
-                }
+                // Load modules based on course and semester
+                $('#semester').change(function() {
+                    var courseId = $('#course').val();
+                    var semester = $(this).val();
+                    if (courseId && semester) {
+                        $.ajax({
+                            url: "get_modules.php",
+                            method: "POST",
+                            data: {
+                                courseId: courseId,
+                                semester: semester
+                            },
+                            success: function(data) {
+                                $('#module-table tbody').html(data);
+                            }
+                        });
+                    } else {
+                        $('#module-table tbody').empty();
+                    }
+                });
             });
         </script>
         <script src="../js/jquery/jquery-2.2.4.min.js"></script>
