@@ -1,12 +1,7 @@
 <?php
 session_start();
-error_reporting(0);
-include('includes/config.php');
 
-if (strlen($_SESSION['alogin']) == 0) {
-    header("Location: index.php");
-    exit();
-}
+include('includes/config.php');
 
 if (isset($_POST['search'])) {
     $searchKey = trim($_POST['searchKey']);
@@ -57,6 +52,7 @@ function calculateGrade($marks)
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,79 +115,123 @@ function calculateGrade($marks)
             font-weight: bold;
             color: #28a745;
         }
+
+        .navbar-brand img {
+            height: 40px;
+        }
+        
     </style>
 </head>
+
 <body>
-<div class="container">
-    <h2>Search Student Details</h2>
-    <form method="POST">
-        <div class="form-row align-items-center">
-            <div class="col-md-10">
-                <input type="text" name="searchKey" class="form-control" placeholder="Enter NIC or Registration Number" required>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" name="search" class="btn btn-primary btn-block">Search</button>
-            </div>
+    <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+     <a class="navbar-brand" href="#">
+            <img src="images/logo.png" style="width: 150%;" alt="Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="admin-login.php">Admin</a>
+                </li>
+                
+            </ul>
         </div>
-    </form>
+    </nav>
 
-    <?php if (isset($studentInfo) && $studentInfo) { ?>
-        <table class="table table-bordered">
-            <tr><th>Student Name</th><td><?= htmlentities($studentInfo->fullname) ?></td></tr>
-            <tr><th>NIC</th><td><?= htmlentities($studentInfo->nic) ?></td></tr>
-            <tr><th>Registration Number</th><td><?= htmlentities($studentInfo->reg_no) ?></td></tr>
-        </table>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<h3>Student Result Management System</h3>
+    </nav>
+    </div>
 
-        <h3>Results Semester-Wise</h3>
-        <?php
-        $overallWeightedGradePoints = 0;
-        $totalCredits = 0;
+    <div class="container mt-4">
+        <h4 style="text-align: center;">Search Student Details</h4>
+        <form method="POST">
+            <div class="form-row align-items-center">
+                <div class="col-md-10">
+                    <input type="text" name="searchKey" class="form-control m-1" placeholder="Enter NIC or Registration Number" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" name="search" class="btn btn-primary btn-block">Search</button>
+                </div>
+            </div>
+        </form>
 
-        foreach ($semesterResults as $semester => $results) {
-            $semesterWeightedGradePoints = 0;
-            $semesterCredits = 0;
-        ?>
-            <h4 class="semester-header">Semester: <?= htmlentities($semester) ?></h4>
-            <table class="table table-bordered">
-                <thead>
-                <tr><th>Module</th><th>Grade</th><th>Exam Year</th></tr>
-                </thead>
-                <tbody>
-                <?php
-                foreach ($results as $result) {
-                    $gradeData = calculateGrade($result->marks);
-                    $semesterWeightedGradePoints += $gradeData['gradePoint'] * $result->credit;
-                    $semesterCredits += $result->credit;
-                ?>
-                    <tr>
-                        <td><?= htmlentities($result->module_name) ?></td>
-                        <td><?= $gradeData['grade'] ?></td>
-                        <td><?= date('Y', strtotime($result->date)) ?></td>
-                    </tr>
-                <?php } ?>
-                </tbody>
+        <?php if (isset($studentInfo) && $studentInfo) { ?>
+            <table class="table table-bordered mt-4">
+                <tr>
+                    <th>Student Name</th>
+                    <td><?= htmlentities($studentInfo->fullname) ?></td>
+                </tr>
+                <tr>
+                    <th>NIC</th>
+                    <td><?= htmlentities($studentInfo->nic) ?></td>
+                </tr>
+                <tr>
+                    <th>Registration Number</th>
+                    <td><?= htmlentities($studentInfo->reg_no) ?></td>
+                </tr>
             </table>
 
+            <h3>Results Semester-Wise</h3>
             <?php
-            if ($semesterCredits > 0) {
-                $semesterGPA = $semesterWeightedGradePoints / $semesterCredits;
-                echo "<p><strong>Semester GPA:</strong> " . number_format($semesterGPA, 2) . "</p>";
+            $overallWeightedGradePoints = 0;
+            $totalCredits = 0;
+
+            foreach ($semesterResults as $semester => $results) {
+                $semesterWeightedGradePoints = 0;
+                $semesterCredits = 0;
+            ?>
+                <h4 class="semester-header">Semester: <?= htmlentities($semester) ?></h4>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Grade</th>
+                            <th>Exam Year</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach ($results as $result) {
+                            $gradeData = calculateGrade($result->marks);
+                            $semesterWeightedGradePoints += $gradeData['gradePoint'] * $result->credit;
+                            $semesterCredits += $result->credit;
+                        ?>
+                            <tr>
+                                <td><?= htmlentities($result->module_name) ?></td>
+                                <td><?= $gradeData['grade'] ?></td>
+                                <td><?= date('Y', strtotime($result->date)) ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+
+            <?php
+                if ($semesterCredits > 0) {
+                    $semesterGPA = $semesterWeightedGradePoints / $semesterCredits;
+                    echo "<p><strong>Semester GPA:</strong> " . number_format($semesterGPA, 2) . "</p>";
+                }
+
+                $overallWeightedGradePoints += $semesterWeightedGradePoints;
+                $totalCredits += $semesterCredits;
             }
 
-            $overallWeightedGradePoints += $semesterWeightedGradePoints;
-            $totalCredits += $semesterCredits;
-        }
+            if ($totalCredits > 0) {
+                $overallGPA = $overallWeightedGradePoints / $totalCredits;
+                echo "<p class='overall-gpa'>Overall GPA: " . number_format($overallGPA, 2) . "</p>";
+            }
+            ?>
+        <?php } elseif (isset($_POST['search'])) { ?>
+            <div class="alert alert-danger">No results found for the provided NIC or Registration Number.</div>
+        <?php } ?>
+    </div>
 
-        if ($totalCredits > 0) {
-            $overallGPA = $overallWeightedGradePoints / $totalCredits;
-            echo "<p class='overall-gpa'>Overall GPA: " . number_format($overallGPA, 2) . "</p>";
-        }
-        ?>
-    <?php } elseif (isset($_POST['search'])) { ?>
-        <div class="alert alert-danger">No results found for the provided NIC or Registration Number.</div>
-    <?php } ?>
-</div>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
 </body>
+
 </html>

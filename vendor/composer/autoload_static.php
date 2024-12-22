@@ -19,6 +19,7 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         'S' => 
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Suman\\Erms\\' => 11,
         ),
         'P' => 
         array (
@@ -46,6 +47,10 @@ class ComposerStaticInit62e10e6c8df9afc192311b196c75bb33
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Suman\\Erms\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (

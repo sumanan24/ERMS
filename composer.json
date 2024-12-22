@@ -1,4 +1,16 @@
 {
+    "name": "suman/erms",
+    "autoload": {
+        "psr-4": {
+            "Suman\\Erms\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "sumanan24",
+            "email": "sumanan24@gmail.com"
+        }
+    ],
     "require": {
         "phpoffice/phpspreadsheet": "^1.29"
     }

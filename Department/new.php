@@ -4,7 +4,7 @@ error_reporting(0);
 include('../includes/config.php');
 
 if (strlen($_SESSION['alogin']) == 0) { // Ensures session is valid
-    header("Location: index.php");
+    header("Location: ../index.php");
 } else {
     if (isset($_POST['submit'])) {
         $dname = $_POST['dname'];

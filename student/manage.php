@@ -71,8 +71,7 @@ if (strlen($_SESSION['alogin']) == "") {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li>Students</li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
                                         <li class="active">Manage Students</li>
                                     </ul>
                                 </div>
