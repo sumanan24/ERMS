@@ -69,7 +69,14 @@
                     <ul class="child-nav">
                         <li><a href="../exams/new.php"><i class="fa fa-bars"></i> <span>New</span></a></li>
                         <li><a href="../exams/manage.php"><i class="fa fa fa-server"></i> <span>Manage</span></a></li>
+                        <li><a href="../exams/report.php"><i class="fa fa fa-server"></i> <span>Report</span></a></li>
+                        <li><a href="../exams/approved.php"><i class="fa fa fa-server"></i> <span>Approved</span></a></li>
                     </ul>
+                </li>
+
+                <li >
+                    <a href="../Department/admin.php"><i class="fa fa-user"></i> <span>Admin</span> </a>
+                    
                 </li>
 
                 

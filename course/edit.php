@@ -21,9 +21,7 @@ if (strlen($_SESSION['alogin']) == 0) { // Ensures session is valid
 
         if ($query->rowCount() > 0) {
             $msg = "Course updated successfully";
-        } else {
-            $error = "No changes made or something went wrong. Please try again.";
-        }
+        } 
     }
 
     // Fetch existing course details for pre-filling the form

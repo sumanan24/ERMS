@@ -149,6 +149,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                                     <label for="excelFile">Upload Excel File</label>
                                                                     <input type="file" class="form-control-file" id="excelFile" name="excelFile" accept=".xlsx, .xls" required>
                                                                 </div>
+                                                                <a href="student.xlsx"><u>Sample Excel File</u></a>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

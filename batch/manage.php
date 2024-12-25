@@ -2,19 +2,38 @@
 session_start();
 error_reporting(0);
 include('../includes/config.php');
+
 if (strlen($_SESSION['alogin']) == "") {
     header("Location: ../index.php");
 } else {
     if (isset($_GET['id'])) {
         $batchid = $_GET['id'];
-        $sql = "DELETE FROM batch WHERE id = :batchid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':batchid', $batchid, PDO::PARAM_STR);
-        $query->execute();
-        echo '<script>alert("Batch deleted successfully.");</script>';
-    }
 
+        // Find the batch number and check for allocated students
+        $checkSql = "
+            SELECT COUNT(student.id) as studentCount 
+            FROM student 
+            JOIN batch ON batch.batch_no = student.bid and batch.cid = student.cid
+            WHERE batch.id = :batchid
+        ";
+        $checkQuery = $dbh->prepare($checkSql);
+        $checkQuery->bindParam(':batchid', $batchid, PDO::PARAM_STR);
+        $checkQuery->execute();
+        $result = $checkQuery->fetch(PDO::FETCH_OBJ);
+
+        if ($result->studentCount > 0) {
+            echo '<script>alert("Cannot delete this batch. Students are already allocated.");</script>';
+        } else {
+            $sql = "DELETE FROM batch WHERE id = :batchid";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':batchid', $batchid, PDO::PARAM_STR);
+            $query->execute();
+            echo '<script>alert("Batch deleted successfully.");</script>';
+        }
+    }
 ?>
+
+
 
     <!DOCTYPE html>
     <html lang="en">
@@ -61,15 +80,17 @@ if (strlen($_SESSION['alogin']) == "") {
                     <div class="main-page">
                         <div class="container-fluid">
                             <div class="row page-title-div">
-                                <div class="col-md-6">
+                                <div class="col-md-10">
                                     <h2 class="title">Manage Batches</h2>
+                                </div>
+                                <div class="col-md-2">
+                                   <br> <a href="new.php" class="btn btn-primary">New Batch</a>
                                 </div>
                             </div>
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li>Batches</li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
                                         <li class="active">Manage Batches</li>
                                     </ul>
                                 </div>

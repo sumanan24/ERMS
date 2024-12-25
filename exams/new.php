@@ -12,20 +12,40 @@ if (strlen($_SESSION['alogin']) == 0) {
         $dates = $_POST['date']; // Array of dates
         $times = $_POST['time']; // Array of times
 
-        $sql = "INSERT INTO exam(mid, bid, date, time,Status) VALUES(:moduleId, :batchId, :examDate, :examTime,'Pending')";
-        $query = $dbh->prepare($sql);
-
+        $alert = false; // Flag to indicate duplicate entry
         foreach ($modules as $key => $moduleId) {
-            $examDate = date('Y-m-d', strtotime($dates[$key])); // Ensure correct format
-            $examTime = $times[$key];
-            $query->bindParam(':moduleId', $moduleId, PDO::PARAM_INT);
-            $query->bindParam(':batchId', $batchId, PDO::PARAM_INT);
-            $query->bindParam(':examDate', $examDate, PDO::PARAM_STR);
-            $query->bindParam(':examTime', $examTime, PDO::PARAM_STR);
-            $query->execute();
+            // Check if the combination of mid and bid already exists
+            $sqlCheck = "SELECT * FROM exam WHERE mid = :moduleId AND bid = :batchId";
+            $queryCheck = $dbh->prepare($sqlCheck);
+            $queryCheck->bindParam(':moduleId', $moduleId, PDO::PARAM_INT);
+            $queryCheck->bindParam(':batchId', $batchId, PDO::PARAM_INT);
+            $queryCheck->execute();
+
+            if ($queryCheck->rowCount() > 0) {
+                $alert = true; // Duplicate found
+                break; // Exit the loop
+            }
         }
-        $msg = "Exam schedule created successfully!";
+
+        if ($alert) {
+            $error = "An exam for the selected module and batch already exists!";
+        } else {
+            $sql = "INSERT INTO exam(mid, bid, date, time, Status) VALUES(:moduleId, :batchId, :examDate, :examTime, 'Pending')";
+            $query = $dbh->prepare($sql);
+
+            foreach ($modules as $key => $moduleId) {
+                $examDate = date('Y-m-d', strtotime($dates[$key])); // Ensure correct format
+                $examTime = $times[$key];
+                $query->bindParam(':moduleId', $moduleId, PDO::PARAM_INT);
+                $query->bindParam(':batchId', $batchId, PDO::PARAM_INT);
+                $query->bindParam(':examDate', $examDate, PDO::PARAM_STR);
+                $query->bindParam(':examTime', $examTime, PDO::PARAM_STR);
+                $query->execute();
+            }
+            $msg = "Exam schedule created successfully!";
+        }
     }
+
 
 ?>
 
@@ -100,15 +120,15 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                 </div>
                                             </div>
                                             <?php if ($msg) { ?>
-                                                <div class="alert alert-success left-icon-alert" aria-label="Close" role="alert">
+                                                <div class="alert alert-success left-icon-alert" role="alert">
                                                     <strong>Well done!</strong> <?php echo htmlentities($msg); ?>
-                                                    <meta http-equiv='refresh' content='1.5'>
                                                 </div>
                                             <?php } else if ($error) { ?>
                                                 <div class="alert alert-danger left-icon-alert" role="alert">
                                                     <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
                                                 </div>
                                             <?php } ?>
+
                                             <div class="panel-body">
                                                 <form method="post">
                                                     <div class="form-group">
@@ -145,6 +165,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                             <option value="2">Semester 2</option>
                                                             <option value="3">Semester 3</option>
                                                             <option value="4">Semester 4</option>
+                                                            <option value="5">Semester 5</option>
+                                                            <option value="6">Semester 6</option>
                                                         </select>
                                                     </div>
 

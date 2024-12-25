@@ -86,8 +86,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li><a href="#">Batches</a></li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li><a href="manage.php">Batches</a></li>
                                         <li class="active">Create Batch</li>
                                     </ul>
                                 </div>

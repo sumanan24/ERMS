@@ -9,7 +9,6 @@ if (strlen($_SESSION['alogin']) == "") {
     // Code for Deletion
     if (isset($_GET['id'])) {
         $examid = $_GET['id'];
-
         // Check if the exam has associated results
         $checkResultsSql = "SELECT COUNT(*) as result_count FROM results WHERE examid = :examid";
         $checkResultsQuery = $dbh->prepare($checkResultsSql);
@@ -22,7 +21,7 @@ if (strlen($_SESSION['alogin']) == "") {
             echo '<script>alert("Cannot delete this exam as it has associated results.");</script>';
         } else {
             // Proceed with deletion if no results exist
-            $sql = "DELETE FROM exams WHERE id = :examid";
+            $sql = "DELETE FROM exam WHERE id = :examid";
             $query = $dbh->prepare($sql);
             $query->bindParam(':examid', $examid, PDO::PARAM_STR);
             $query->execute();
@@ -33,6 +32,7 @@ if (strlen($_SESSION['alogin']) == "") {
     // Fetch filters
     $courseFilter = isset($_POST['course']) ? $_POST['course'] : '';
     $batchFilter = isset($_POST['batch']) ? $_POST['batch'] : '';
+    $semesterFilter = isset($_POST['semester']) ? $_POST['semester'] : '';
 
     // Build SQL query based on filters
     $sql = "SELECT e.id, e.date, m.mname as module_name, b.batch_no, c.cname as course_name,
@@ -50,6 +50,9 @@ if (strlen($_SESSION['alogin']) == "") {
     if ($batchFilter) {
         $conditions[] = "b.id = :batch";
     }
+    if ($semesterFilter) {
+        $conditions[] = "m.semester = :semester";
+    }
 
     if (count($conditions) > 0) {
         $sql .= " WHERE " . implode(" AND ", $conditions);
@@ -62,6 +65,9 @@ if (strlen($_SESSION['alogin']) == "") {
     }
     if ($batchFilter) {
         $query->bindParam(':batch', $batchFilter, PDO::PARAM_STR);
+    }
+    if ($semesterFilter) {
+        $query->bindParam(':semester', $semesterFilter, PDO::PARAM_STR);
     }
 
     $query->execute();
@@ -120,8 +126,7 @@ if (strlen($_SESSION['alogin']) == "") {
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
-                                        <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li>Exams</li>
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
                                         <li class="active">Manage Exams</li>
                                     </ul>
                                 </div>
@@ -140,7 +145,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                             <div class="panel-body">
                                                 <form method="POST">
                                                     <div class="row">
-                                                        <div class="col-sm-5">
+                                                        <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="course">Course</label>
                                                                 <select name="course" id="course" class="form-control">
@@ -158,7 +163,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-sm-5">
+                                                        <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="batch">Batch</label>
                                                                 <select name="batch" id="batch" class="form-control">
@@ -176,13 +181,23 @@ if (strlen($_SESSION['alogin']) == "") {
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-sm-2">
-                                                            <br><button type="submit" class="btn btn-primary" style="width: 100%;">Search Exam</button>
-
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="semester">Semester</label>
+                                                                <select name="semester" id="semester" class="form-control">
+                                                                    <option value="">Select Semester</option>
+                                                                    <option value="1">Semester 1</option>
+                                                                    <option value="2">Semester 2</option>
+                                                                    <option value="3">Semester 3</option>
+                                                                </select>
+                                                            </div>
                                                         </div>
                                                     </div>
-
-
+                                                    <div class="row">
+                                                        <div class="col-sm-2">
+                                                            <button type="submit" class="btn btn-primary" style="width: 100%;">Search Exam</button>
+                                                        </div>
+                                                    </div>
                                                 </form>
                                             </div>
                                         </div>
@@ -196,7 +211,6 @@ if (strlen($_SESSION['alogin']) == "") {
                                                 <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
                                                     <thead>
                                                         <tr>
-
                                                             <th>Module Name</th>
                                                             <th>Batch No</th>
                                                             <th>Date</th>
@@ -208,7 +222,6 @@ if (strlen($_SESSION['alogin']) == "") {
                                                     </thead>
                                                     <tfoot>
                                                         <tr>
-
                                                             <th>Module Name</th>
                                                             <th>Batch No</th>
                                                             <th>Date</th>
@@ -225,7 +238,6 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                 $percentage = ($result->total_students > 0) ? round(($result->above_40 / $result->total_students) * 100, 2) : 0;
                                                         ?>
                                                                 <tr>
-
                                                                     <td><?php echo htmlentities($result->module_name); ?></td>
                                                                     <td><?php echo htmlentities($result->batch_no); ?></td>
                                                                     <td><?php echo htmlentities($result->date); ?></td>
@@ -239,7 +251,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        <a href="edit.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Edit </a>
+                                                                    <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#editExamModal" data-id="<?php echo $result->id; ?>" data-date="<?php echo $result->date; ?>" data-time="<?php echo $result->time; ?>">Edit</button>
                                                                         <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
                                                                         <a href="result.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Add Result </a>
                                                                     </td>
@@ -259,6 +271,37 @@ if (strlen($_SESSION['alogin']) == "") {
                 </div>
             </div>
         </div>
+
+        <!-- Edit Exam Modal -->
+        <div class="modal fade" id="editExamModal" tabindex="-1" role="dialog" aria-labelledby="editExamModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form method="POST">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="editExamModalLabel">Edit Exam</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="examid" id="examid">
+                            <div class="form-group">
+                                <label for="date">Date</label>
+                                <input type="date" class="form-control" name="date" id="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="time">Time</label>
+                                <input type="time" class="form-control" name="time" id="time" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="update_exam" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
         <script src="../js/jquery/jquery-2.2.4.min.js"></script>
         <script src="../js/bootstrap/bootstrap.min.js"></script>
         <script src="../js/pace/pace.min.js"></script>
@@ -269,6 +312,25 @@ if (strlen($_SESSION['alogin']) == "") {
         <script>
             $(function($) {
                 $('#example').DataTable();
+            });
+        </script>
+
+        <script>
+            $(document).ready(function() {
+                $('#example').DataTable();
+
+                // Populate modal with data
+                $('#editExamModal').on('show.bs.modal', function(event) {
+                    var button = $(event.relatedTarget);
+                    var id = button.data('id');
+                    var date = button.data('date');
+                    var time = button.data('time');
+
+                    var modal = $(this);
+                    modal.find('#examid').val(id);
+                    modal.find('#date').val(date);
+                    modal.find('#time').val(time);
+                });
             });
         </script>
     </body>

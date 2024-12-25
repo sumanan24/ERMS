@@ -16,8 +16,8 @@ if (isset($_POST['courseId']) && isset($_POST['semester'])) {
         foreach ($results as $result) {
             echo "<tr>
                 <td><input type='hidden' name='module[]' value='" . htmlentities($result->id) . "'>" . htmlentities($result->mname) . "</td>
-                <td><input type='date' name='date[]' class='form-control' required></td>
-                <td><input type='time' name='time[]' class='form-control' required></td>
+                <td><input type='date' name='date[]' class='form-control' ></td>
+                <td><input type='time' name='time[]' class='form-control'></td>
             </tr>";
         }
     } else {
