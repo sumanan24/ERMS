@@ -252,8 +252,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     </td>
                                                                     <td>
                                                                     <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#editExamModal" data-id="<?php echo $result->id; ?>" data-date="<?php echo $result->date; ?>" data-time="<?php echo $result->time; ?>">Edit</button>
-                                                                        <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
-                                                                        <a href="result.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Add Result </a>
+                                                                        <a href="result.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-primary btn-xs"> Add Result </a>
                                                                     </td>
                                                                 </tr>
                                                         <?php

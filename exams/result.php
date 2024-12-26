@@ -31,61 +31,18 @@ if (!$examDetails) {
     die('Exam not found.');
 }
 
-// Fetch students and their results for the batch
-$sql = "SELECT s.id as student_id, s.reg_no, s.fullname, r.attempt, r.marks 
+// Fetch all students in the batch, even if they don't have results
+$sql = "SELECT s.id as student_id, s.reg_no, s.fullname, COALESCE(r.attempt, 1) as attempt, r.marks 
         FROM student s
         JOIN batch b ON s.bid = b.batch_no
-        LEFT JOIN results r ON r.studentid = s.id 
-        WHERE r.examid = :examid
+        LEFT JOIN results r ON r.studentid = s.id AND r.examid = :examid
+        WHERE b.batch_no = :batch_no
         ORDER BY s.id";
 $query = $dbh->prepare($sql);
 $query->bindParam(':examid', $examid, PDO::PARAM_INT);
+$query->bindParam(':batch_no', $examDetails->batch_no, PDO::PARAM_STR);
 $query->execute();
 $students = $query->fetchAll(PDO::FETCH_OBJ);
-
-// Handle adding repeat student
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reg_no']) && !empty($_POST['reg_no'])) {
-    $reg_no = $_POST['reg_no'];
-
-    // Find student by reg_no
-    $sql = "SELECT * FROM student WHERE reg_no = :reg_no";
-    $query = $dbh->prepare($sql);
-    $query->bindParam(':reg_no', $reg_no, PDO::PARAM_STR);
-    $query->execute();
-    $student = $query->fetch(PDO::FETCH_OBJ);
-
-    if ($student) {
-        // Check if the student is already in the exam batch
-        $sql = "SELECT * FROM results WHERE examid = :examid AND studentid = :studentid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':examid', $examid, PDO::PARAM_INT);
-        $query->bindParam(':studentid', $student->id, PDO::PARAM_INT);
-        $query->execute();
-        $existingResult = $query->fetch(PDO::FETCH_OBJ);
-
-        // Increment attempt number if result exists, otherwise set to 1
-        $attempt = ($existingResult) ? $existingResult->attempt + 1 : 1;
-
-        // Insert result for the student or update if already exists
-        if ($existingResult) {
-            $sql = "UPDATE results SET attempt = :attempt WHERE examid = :examid AND studentid = :studentid";
-            $query = $dbh->prepare($sql);
-            $query->bindParam(':attempt', $attempt, PDO::PARAM_INT);
-            $query->bindParam(':examid', $examid, PDO::PARAM_INT);
-            $query->bindParam(':studentid', $student->id, PDO::PARAM_INT);
-        } else {
-            $sql = "INSERT INTO results (examid, studentid, attempt) VALUES (:examid, :studentid, :attempt)";
-            $query = $dbh->prepare($sql);
-            $query->bindParam(':examid', $examid, PDO::PARAM_INT);
-            $query->bindParam(':studentid', $student->id, PDO::PARAM_INT);
-            $query->bindParam(':attempt', $attempt, PDO::PARAM_INT);
-        }
-        $query->execute();
-        $msg = "Student added successfully!";
-    } else {
-        $msg = "Student with registration number $reg_no not found!";
-    }
-}
 
 // Handle saving results
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['data']) && !empty($_POST['data'])) {
@@ -174,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['data']) && !empty($_PO
                                         <div class="panel-body p-20">
                                             <!-- Display success or error message -->
                                             <?php if (isset($msg)) { ?>
-                                                <div class="alert alert-success"><?php echo $msg; ?></div>
+                                                <div class="alert alert-success"> <?php echo $msg; ?> </div>
                                                 <meta http-equiv='refresh' content='1.5'>
                                             <?php } ?>
 
@@ -204,20 +161,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['data']) && !empty($_PO
                                                     </table>
                                                 </div>
                                             </div>
-
-                                            <br>
-                                            <!-- Registration number form -->
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <form method="post" class="mt-4">
-                                                        <div class="form-group">
-                                                            <label for="reg_no">Enter Repeat Students Registration Number:</label>
-                                                            <input type="text" name="reg_no" id="reg_no" class="form-control" value="<?php echo htmlentities($reg_no); ?>" required>
-                                                        </div>
-                                                        <button type="submit" class="btn btn-primary">Add Student</button>
-                                                    </form>
-                                                </div>
-                                            </div>
                                             <br>
                                             <!-- Results table -->
                                             <form method="post" class="mt-4">
@@ -240,10 +183,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['data']) && !empty($_PO
                                                                         <input type="hidden" name="data[<?php echo $student->student_id; ?>][student_id]" value="<?php echo $student->student_id; ?>">
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number" name="data[<?php echo $student->student_id; ?>][attempt]" class="form-control" value="<?php echo htmlentities($student->attempt ?? 1); ?>" required>
+                                                                        <input type="number" name="data[<?php echo $student->student_id; ?>][attempt]" class="form-control" value="<?php echo htmlentities($student->attempt); ?>" required>
                                                                     </td>
                                                                     <td>
-                                                                        <input type="text" name="data[<?php echo $student->student_id; ?>][marks]" class="form-control" value="<?php echo htmlentities($student->marks ?? ''); ?>" required>
+                                                                        <input type="text" name="data[<?php echo $student->student_id; ?>][marks]" class="form-control" value="<?php echo htmlentities($student->marks); ?>">
                                                                     </td>
                                                                 </tr>
                                                             <?php }
