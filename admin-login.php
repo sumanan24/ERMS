@@ -46,15 +46,15 @@ if (isset($_POST['login'])) {
 
         <div class="">
             <div class="row">
-                <h1 align="center">Student Result Management System</h1>
+                <h1 align="center">Result Management System</h1>
 
                 <div class="col-lg-3"></div>
                 <div class="col-lg-6">
                     <section class="section">
-                        <div class="row mt-40">
-                            <div class="col-md-10 col-md-offset-1 pt-50">
+                        <div class="row">
+                            <div class="col-md-10 col-md-offset-1">
 
-                                <div class="row mt-30 ">
+                                <div class="row ">
                                     <div class="col-md-11">
                                         <div class="panel">
                                             <div class="panel-heading">
@@ -80,19 +80,14 @@ if (isset($_POST['login'])) {
 
                                                     <div class="form-group mt-20">
                                                         <div class="col-sm-offset-2 col-sm-10">
-
                                                             <button type="submit" name="login" class="btn btn-success btn-labeled pull-right">Sign in<span class="btn-label btn-label-right"><i class="fa fa-check"></i></span></button>
                                                         </div>
                                                     </div>
                                                 </form>
-
-
-
-
                                             </div>
                                         </div>
                                         <!-- /.panel -->
-                                        <p class="text-muted text-center"><small>Student Result Management System</small></p>
+                                        <p class="text-muted text-center"><small>University College Jaffna</small></p>
                                     </div>
                                     <!-- /.col-md-11 -->
                                 </div>

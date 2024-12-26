@@ -25,6 +25,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                 $alert = true; // Duplicate found
                 break; // Exit the loop
             }
+            
         }
 
         if ($alert) {
@@ -45,8 +46,6 @@ if (strlen($_SESSION['alogin']) == 0) {
             $msg = "Exam schedule created successfully!";
         }
     }
-
-
 ?>
 
 

@@ -69,241 +69,261 @@ if (strlen($_SESSION['alogin']) == 0) {
     </head>
 
     <body class="top-navbar-fixed">
-    <div class="main-wrapper">
-        <?php include('../includes/topbar.php'); ?>
-        <div class="content-wrapper">
-            <div class="content-container">
-                <?php include('../includes/leftbar.php'); ?>
-                <div class="main-page">
-                    <div class="container-fluid">
-                        <div class="row page-title-div">
-                            <div class="col-md-6">
-                                <h2 class="title">Create Student</h2>
-                            </div>
-                        </div>
-                        <div class="row breadcrumb-div">
-                            <div class="col-md-6">
-                                <ul class="breadcrumb">
-                                    <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                    <li><a href="manage.php">Students</a></li>
-                                    <li class="active">Create Student</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <section class="section">
+        <div class="main-wrapper">
+            <?php include('../includes/topbar.php'); ?>
+            <div class="content-wrapper">
+                <div class="content-container">
+                    <?php include('../includes/leftbar.php'); ?>
+                    <div class="main-page">
                         <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-md-8 col-md-offset-2">
-                                    <div class="panel">
-                                        <div class="panel-heading">
-                                            <div class="panel-title">
-                                                <h5>Student</h5>
-                                            </div>
-                                            &nbsp;&nbsp; <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentInsertModal">
-                                                Import Excel Students
-                                            </button>
+                            <div class="row page-title-div">
+                                <div class="col-md-6">
+                                    <h2 class="title">Create Student</h2>
+                                </div>
+                            </div>
+                            <div class="row breadcrumb-div">
+                                <div class="col-md-6">
+                                    <ul class="breadcrumb">
+                                        <li><a href="../dashboard/dashboard.php"><i class="fa fa-home"></i> Home</a></li>
+                                        <li><a href="manage.php">Students</a></li>
+                                        <li class="active">Create Student</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <section class="section">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <div class="panel">
+                                            <div class="panel-heading">
+                                                <div class="panel-title">
+                                                    <h5>Student</h5>
+                                                </div>
+                                                &nbsp;&nbsp; <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentInsertModal">
+                                                    Import Excel Students
+                                                </button>
 
-                                            <!-- Modal -->
-                                            <div class="modal fade" id="studentInsertModal" tabindex="-1" role="dialog" aria-labelledby="studentInsertModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="studentInsertModalLabel">Import Students</h5>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <form id="importStudentsForm" action="import_students.php" method="post" enctype="multipart/form-data">
-                                                            <div class="modal-body">
-                                                                <div class="form-group">
-                                                                    <label for="department">Department</label>
-                                                                    <select name="department" id="modalDepartment" class="form-control" required>
-                                                                        <option value="">Select Department</option>
-                                                                        <?php
-                                                                        $sql = "SELECT * FROM department";
-                                                                        $query = $dbh->prepare($sql);
-                                                                        $query->execute();
-                                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                                        if ($query->rowCount() > 0) {
-                                                                            foreach ($results as $result) {
-                                                                                echo "<option value='" . htmlentities($result->id) . "'>" . htmlentities($result->dname) . "</option>";
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="studentInsertModal" tabindex="-1" role="dialog" aria-labelledby="studentInsertModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="studentInsertModalLabel">Import Students</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <form id="importStudentsForm" action="import_students.php" method="post" enctype="multipart/form-data">
+                                                                <div class="modal-body">
+                                                                    <div class="form-group">
+                                                                        <label for="department">Department</label>
+                                                                        <select name="department" id="modalDepartment" class="form-control" required>
+                                                                            <option value="">Select Department</option>
+                                                                            <?php
+                                                                            $sql = "SELECT * FROM department";
+                                                                            $query = $dbh->prepare($sql);
+                                                                            $query->execute();
+                                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                                            if ($query->rowCount() > 0) {
+                                                                                foreach ($results as $result) {
+                                                                                    echo "<option value='" . htmlentities($result->id) . "'>" . htmlentities($result->dname) . "</option>";
+                                                                                }
                                                                             }
-                                                                        }
-                                                                        ?>
-                                                                    </select>
+                                                                            ?>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="course">Course</label>
+                                                                        <select class="form-control" id="modalCourse" name="course" required>
+                                                                            <option value="">Select Course</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="batch">Batch</label>
+                                                                        <select class="form-control" id="modalBatch" name="batch" required>
+                                                                            <option value="">Select Batch</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="excelFile">Upload Excel File</label>
+                                                                        <input type="file" class="form-control-file" id="excelFile" name="excelFile" accept=".xlsx, .xls" required>
+                                                                    </div>
+                                                                    <a href="student.xlsx"><u>Sample Excel File</u></a>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="course">Course</label>
-                                                                    <select class="form-control" id="modalCourse" name="course" required>
-                                                                        <option value="">Select Course</option>
-                                                                    </select>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                    <button type="submit" class="btn btn-primary">Import</button>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="batch">Batch</label>
-                                                                    <select class="form-control" id="modalBatch" name="batch" required>
-                                                                        <option value="">Select Batch</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="excelFile">Upload Excel File</label>
-                                                                    <input type="file" class="form-control-file" id="excelFile" name="excelFile" accept=".xlsx, .xls" required>
-                                                                </div>
-                                                                <a href="student.xlsx"><u>Sample Excel File</u></a>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-primary">Import</button>
-                                                            </div>
-                                                        </form>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                            <?php if (isset($_SESSION['success'])) { ?>
+                                                <div class="alert alert-success">
+                                                    <?php echo htmlentities($_SESSION['success']);
+                                                    unset($_SESSION['success']); ?>
+                                                </div>
+                                                <meta http-equiv='refresh' content='1.5'>
+                                            <?php } else if (isset($_SESSION['error'])) { ?>
+                                                <div class="alert alert-danger">
+                                                    <?php echo htmlentities($_SESSION['error']);
+                                                    unset($_SESSION['error']); ?>
+                                                </div>
+                                            <?php } ?>
 
-                                        <div class="panel-body">
-                                            <form method="post">
-                                                <div class="form-group">
-                                                    <label for="reg_no">Registration Number</label>
-                                                    <input type="text" name="reg_no" class="form-control" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="fullname">Full Name</label>
-                                                    <input type="text" name="fullname" class="form-control" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="nic">NIC</label>
-                                                    <input type="text" name="nic" class="form-control" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="department">Department</label>
-                                                    <select name="department" id="department1" class="form-control" required>
-                                                        <option value="">Select Department</option>
-                                                        <?php
-                                                        $sql = "SELECT * FROM department";
-                                                        $query = $dbh->prepare($sql);
-                                                        $query->execute();
-                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                        if ($query->rowCount() > 0) {
-                                                            foreach ($results as $result) {
-                                                                echo "<option value='" . htmlentities($result->id) . "'>" . htmlentities($result->dname) . "</option>";
+                                            <div class="panel-body">
+                                                <form method="post">
+                                                    <div class="form-group">
+                                                        <label for="reg_no">Registration Number</label>
+                                                        <input type="text" name="reg_no" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="fullname">Full Name</label>
+                                                        <input type="text" name="fullname" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="nic">NIC</label>
+                                                        <input type="text" name="nic" class="form-control" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="department">Department</label>
+                                                        <select name="department" id="department1" class="form-control" required>
+                                                            <option value="">Select Department</option>
+                                                            <?php
+                                                            $sql = "SELECT * FROM department";
+                                                            $query = $dbh->prepare($sql);
+                                                            $query->execute();
+                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                            if ($query->rowCount() > 0) {
+                                                                foreach ($results as $result) {
+                                                                    echo "<option value='" . htmlentities($result->id) . "'>" . htmlentities($result->dname) . "</option>";
+                                                                }
                                                             }
-                                                        }
-                                                        ?>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="course">Course</label>
-                                                    <select name="course" id="course1" class="form-control" required>
-                                                        <option value="">Select Course</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="batch">Batch</label>
-                                                    <select name="batch" id="batch1" class="form-control" required>
-                                                        <option value="">Select Batch</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group">
-                                                    <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-                                                </div>
-                                            </form>
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="course">Course</label>
+                                                        <select name="course" id="course1" class="form-control" required>
+                                                            <option value="">Select Course</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="batch">Batch</label>
+                                                        <select name="batch" id="batch1" class="form-control" required>
+                                                            <option value="">Select Batch</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="../js/jquery/jquery-2.2.4.min.js"></script>
-    <script src="../js/jquery-ui/jquery-ui.min.js"></script>
-    <script src="../js/bootstrap/bootstrap.min.js"></script>
-    <script src="../js/pace/pace.min.js"></script>
-    <script src="../js/lobipanel/lobipanel.min.js"></script>
-    <script src="../js/iscroll/iscroll.js"></script>
-    <script src="../js/prism/prism.js"></script>
-    <script src="../js/main.js"></script>
+        <script src="../js/jquery/jquery-2.2.4.min.js"></script>
+        <script src="../js/jquery-ui/jquery-ui.min.js"></script>
+        <script src="../js/bootstrap/bootstrap.min.js"></script>
+        <script src="../js/pace/pace.min.js"></script>
+        <script src="../js/lobipanel/lobipanel.min.js"></script>
+        <script src="../js/iscroll/iscroll.js"></script>
+        <script src="../js/prism/prism.js"></script>
+        <script src="../js/main.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            // Load courses based on department selection in modal
-            $('#modalDepartment').change(function () {
-                var deptId = $(this).val();
-                if (deptId) {
-                    $.ajax({
-                        url: "get_courses.php",
-                        method: "POST",
-                        data: { deptId: deptId },
-                        success: function (data) {
-                            $('#modalCourse').html(data);
-                            $('#modalBatch').html('<option value="">Select Batch</option>'); // Reset batch dropdown
-                        }
-                    });
-                } else {
-                    $('#modalCourse').html('<option value="">Select Course</option>');
-                    $('#modalBatch').html('<option value="">Select Batch</option>');
-                }
+        <script>
+            $(document).ready(function() {
+                // Load courses based on department selection in modal
+                $('#modalDepartment').change(function() {
+                    var deptId = $(this).val();
+                    if (deptId) {
+                        $.ajax({
+                            url: "get_courses.php",
+                            method: "POST",
+                            data: {
+                                deptId: deptId
+                            },
+                            success: function(data) {
+                                $('#modalCourse').html(data);
+                                $('#modalBatch').html('<option value="">Select Batch</option>'); // Reset batch dropdown
+                            }
+                        });
+                    } else {
+                        $('#modalCourse').html('<option value="">Select Course</option>');
+                        $('#modalBatch').html('<option value="">Select Batch</option>');
+                    }
+                });
+
+                // Load batches based on course selection in modal
+                $('#modalCourse').change(function() {
+                    var courseId = $(this).val();
+                    if (courseId) {
+                        $.ajax({
+                            url: "get_batches.php",
+                            method: "POST",
+                            data: {
+                                courseId: courseId
+                            },
+                            success: function(data) {
+                                $('#modalBatch').html(data);
+                            }
+                        });
+                    } else {
+                        $('#modalBatch').html('<option value="">Select Batch</option>');
+                    }
+                });
+
+                // Load courses based on department selection outside modal
+                $('#department1').change(function() {
+                    var deptId = $(this).val();
+                    if (deptId) {
+                        $.ajax({
+                            url: "get_courses.php",
+                            method: "POST",
+                            data: {
+                                deptId: deptId
+                            },
+                            success: function(data) {
+                                $('#course1').html(data);
+                                $('#batch1').html('<option value="">Select Batch</option>'); // Reset batch dropdown
+                            }
+                        });
+                    } else {
+                        $('#course1').html('<option value="">Select Course</option>');
+                        $('#batch1').html('<option value="">Select Batch</option>');
+                    }
+                });
+
+                // Load batches based on course selection outside modal
+                $('#course1').change(function() {
+                    var courseId = $(this).val();
+                    if (courseId) {
+                        $.ajax({
+                            url: "get_batches.php",
+                            method: "POST",
+                            data: {
+                                courseId: courseId
+                            },
+                            success: function(data) {
+                                $('#batch1').html(data);
+                            }
+                        });
+                    } else {
+                        $('#batch1').html('<option value="">Select Batch</option>');
+                    }
+                });
             });
-
-            // Load batches based on course selection in modal
-            $('#modalCourse').change(function () {
-                var courseId = $(this).val();
-                if (courseId) {
-                    $.ajax({
-                        url: "get_batches.php",
-                        method: "POST",
-                        data: { courseId: courseId },
-                        success: function (data) {
-                            $('#modalBatch').html(data);
-                        }
-                    });
-                } else {
-                    $('#modalBatch').html('<option value="">Select Batch</option>');
-                }
-            });
-
-            // Load courses based on department selection outside modal
-            $('#department1').change(function () {
-                var deptId = $(this).val();
-                if (deptId) {
-                    $.ajax({
-                        url: "get_courses.php",
-                        method: "POST",
-                        data: { deptId: deptId },
-                        success: function (data) {
-                            $('#course1').html(data);
-                            $('#batch1').html('<option value="">Select Batch</option>'); // Reset batch dropdown
-                        }
-                    });
-                } else {
-                    $('#course1').html('<option value="">Select Course</option>');
-                    $('#batch1').html('<option value="">Select Batch</option>');
-                }
-            });
-
-            // Load batches based on course selection outside modal
-            $('#course1').change(function () {
-                var courseId = $(this).val();
-                if (courseId) {
-                    $.ajax({
-                        url: "get_batches.php",
-                        method: "POST",
-                        data: { courseId: courseId },
-                        success: function (data) {
-                            $('#batch1').html(data);
-                        }
-                    });
-                } else {
-                    $('#batch1').html('<option value="">Select Batch</option>');
-                }
-            });
-        });
-    </script>
-</body>
+        </script>
+    </body>
 
 
     </html>
