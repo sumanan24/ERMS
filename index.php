@@ -39,18 +39,25 @@ if (isset($_POST['search'])) {
 // Function to calculate grade
 function calculateGrade($marks)
 {
-    if ($marks >= 85) return ['grade' => 'A+', 'gradePoint' => 4.0];
-    if ($marks >= 80) return ['grade' => 'A', 'gradePoint' => 4.0];
-    if ($marks >= 75) return ['grade' => 'A-', 'gradePoint' => 3.7];
-    if ($marks >= 70) return ['grade' => 'B+', 'gradePoint' => 3.3];
-    if ($marks >= 65) return ['grade' => 'B', 'gradePoint' => 3.0];
-    if ($marks >= 60) return ['grade' => 'B-', 'gradePoint' => 2.7];
-    if ($marks >= 50) return ['grade' => 'C+', 'gradePoint' => 2.3];
-    if ($marks >= 40) return ['grade' => 'C', 'gradePoint' => 2.0];
-    if ($marks >= 30) return ['grade' => 'C-', 'gradePoint' => 1.7];
-    if ($marks >= 20) return ['grade' => 'D', 'gradePoint' => 1.3];
-    return ['grade' => 'E', 'gradePoint' => 0.0];
+    if (is_numeric($marks)) {
+        if ($marks >= 85) return ['grade' => 'A+', 'gradePoint' => 4.0];
+        if ($marks >= 80) return ['grade' => 'A', 'gradePoint' => 4.0];
+        if ($marks >= 75) return ['grade' => 'A-', 'gradePoint' => 3.7];
+        if ($marks >= 70) return ['grade' => 'B+', 'gradePoint' => 3.3];
+        if ($marks >= 65) return ['grade' => 'B', 'gradePoint' => 3.0];
+        if ($marks >= 60) return ['grade' => 'B-', 'gradePoint' => 2.7];
+        if ($marks >= 50) return ['grade' => 'C+', 'gradePoint' => 2.3];
+        if ($marks >= 40) return ['grade' => 'C', 'gradePoint' => 2.0];
+        if ($marks >= 30) return ['grade' => 'C-', 'gradePoint' => 1.7];
+        if ($marks >= 20) return ['grade' => 'D', 'gradePoint' => 1.3];
+        return ['grade' => 'E', 'gradePoint' => 0.0];
+    } elseif (in_array(strtolower($marks), ['ab', 'absent'])) {
+        return ['grade' => 'AB', 'gradePoint' => 0.0];
+    } else {
+        return null; // Invalid marks
+    }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -177,6 +184,19 @@ function calculateGrade($marks)
             $totalCredits = 0;
 
             foreach ($semesterResults as $semester => $results) {
+                $invalidMarks = false;
+                foreach ($results as $result) {
+                    if (calculateGrade($result->marks) === null) {
+                        $invalidMarks = true;
+                        break;
+                    }
+                }
+
+                if ($invalidMarks) {
+                    echo "<div class='alert alert-danger'>You has offence Semester $semester.</div>";
+                    continue;
+                }
+
                 $semesterWeightedGradePoints = 0;
                 $semesterCredits = 0;
             ?>
@@ -214,8 +234,13 @@ function calculateGrade($marks)
                 $overallWeightedGradePoints += $semesterWeightedGradePoints;
                 $totalCredits += $semesterCredits;
             }
+
+            if ($totalCredits > 0) {
+                $overallGPA = $overallWeightedGradePoints / $totalCredits;
+                echo "<p class='overall-gpa'><strong>Overall GPA:</strong> " . number_format($overallGPA, 2) . "</p>";
+            }
             ?>
-            <p style="text-align: center; color: red; font-weight: bold;"> This document is computer - generated and is not valid for legal purposes. </p>
+            <p style="text-align: center; color: red; font-weight: bold;"> This document is computer-generated and is not valid for legal purposes. </p>
 
         <?php } elseif (isset($_POST['search'])) { ?>
             <div class="alert alert-danger">No results found for the provided NIC or Registration Number.</div>
