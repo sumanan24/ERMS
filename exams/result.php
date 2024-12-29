@@ -81,6 +81,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['data']) && !empty($_PO
 
     $msg = "Results saved successfully!";
 }
+
+
+// Add new student based on registration number
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reg_no']) && !empty($_POST['reg_no'])) {
+    $regNo = $_POST['reg_no'];
+
+    // Find the student in the database
+    $sql = "SELECT id FROM student WHERE reg_no = :reg_no";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':reg_no', $regNo, PDO::PARAM_STR);
+    $query->execute();
+    $student = $query->fetch(PDO::FETCH_OBJ);
+
+    if ($student) {
+        $studentId = $student->id;
+
+        // Find the last attempt for the student
+        $sql = "SELECT MAX(attempt) AS last_attempt FROM results WHERE studentid = :studentid AND examid = :examid";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':studentid', $studentId, PDO::PARAM_INT);
+        $query->bindParam(':examid', $examid, PDO::PARAM_INT);
+        $query->execute();
+        $result = $query->fetch(PDO::FETCH_OBJ);
+        $newAttempt = $result && $result->last_attempt ? $result->last_attempt + 1 : 1;
+
+        // Add the new student to the results table
+        $sql = "INSERT INTO results (examid, studentid, attempt, marks) VALUES (:examid, :studentid, :attempt, NULL)";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':examid', $examid, PDO::PARAM_INT);
+        $query->bindParam(':studentid', $studentId, PDO::PARAM_INT);
+        $query->bindParam(':attempt', $newAttempt, PDO::PARAM_INT);
+        $query->execute();
+
+        $msg = "Student added successfully!";
+    } else {
+        $error = "Registration number not found.";
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -163,6 +202,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['data']) && !empty($_PO
                                             </div>
                                             <br>
                                             <!-- Results table -->
+                                            <form method="post" class="mb-4">
+                                                <div class="form-group">
+                                                    <label for="reg_no">Registration No:</label>
+                                                    <input type="text" name="reg_no" id="reg_no" class="form-control" placeholder="Enter Registration No" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-success">Add Student</button>
+                                            </form>
+
+                                            <!-- Display Success or Error Messages -->
+                                            <?php if (isset($msg)) { ?>
+                                                <div class="alert alert-success"><?php echo $msg; ?></div>
+                                                <meta http-equiv='refresh' content='1.5'>
+                                            <?php } ?>
+                                            <?php if (isset($error)) { ?>
+                                                <div class="alert alert-danger"><?php echo $error; ?></div>
+                                            <?php } ?>
+<br>
                                             <form method="post" class="mt-4">
                                                 <table class="table table-bordered">
                                                     <thead>
