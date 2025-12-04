@@ -146,7 +146,7 @@ if (isset($_POST['login'])) {
             <div class="brand">
                 <div class="logo"><i class="fa fa-shield"></i></div>
                 <h1>ERMS Admin</h1>
-                <p>Sign in to manage exams, modules, and results</p>
+                
             </div>
             <div class="form-area">
                 <form method="post">
@@ -170,7 +170,7 @@ if (isset($_POST['login'])) {
                                 <input type="checkbox" style="margin-right:6px;">Remember me
                             </label>
                         </div>
-                        <a href="#" style="color:#2563eb; text-decoration:underline;">Forgot password?</a>
+                        
                     </div>
                     <div style="margin-top:18px;">
                         <button type="submit" name="login" class="btn btn-primary">Sign in</button>
