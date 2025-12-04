@@ -6,14 +6,26 @@ include('../includes/config.php');
 if (strlen($_SESSION['alogin']) == "") {
     header("Location: ../index.php");
 } else {
+    $currentRole = 'admin';
+    try {
+        $u = $_SESSION['alogin'];
+        $st = $dbh->prepare("SELECT usertype FROM admin WHERE (username=:u OR UserName=:u) LIMIT 1");
+        $st->bindParam(':u', $u, PDO::PARAM_STR);
+        $st->execute();
+        $r = $st->fetch(PDO::FETCH_OBJ);
+        if ($r && isset($r->usertype)) { $currentRole = $r->usertype; }
+    } catch (Exception $e) {}
 
     if (isset($_GET['id'])) {
-        $classid = $_GET['id'];
-        $sql = "DELETE FROM module WHERE id = :classid";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':classid', $classid, PDO::PARAM_STR);
-        $query->execute();
-        echo '<script>alert("Module deleted successfully.");</script>';
+        if ($currentRole === 'user') { echo '<script>alert("You do not have permission to delete.");</script>'; }
+        else {
+            $classid = $_GET['id'];
+            $sql = "DELETE FROM module WHERE id = :classid";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':classid', $classid, PDO::PARAM_STR);
+            $query->execute();
+            echo '<script>alert("Module deleted successfully.");</script>';
+        }
     }
 ?>
     <!DOCTYPE html>
@@ -31,6 +43,17 @@ if (strlen($_SESSION['alogin']) == "") {
         <link rel="stylesheet" type="text/css" href="../js/DataTables/datatables.min.css" />
         <link rel="stylesheet" href="../css/main.css" media="screen">
         <script src="../js/modernizr/modernizr.min.js"></script>
+        <style>
+            body { background: #f5f7fb; color: #111827; }
+            .modern-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 8px 18px rgba(0,0,0,0.05); overflow:hidden; }
+            .modern-card .panel-heading { background:#fff; border-bottom:1px solid #e5e7eb; padding:16px 20px; }
+            .modern-card .panel-title h5 { margin:0; font-weight:700; color:#111827; }
+            .modern-card .panel-body { padding:22px; }
+            .btn-modern { background:#2563eb; border-color:#2563eb; border-radius:10px; padding:8px 14px; font-weight:600; color:#fff; }
+            .btn-modern:hover, .btn-modern:focus { background:#1d4ed8; border-color:#1d4ed8; }
+            .page-title-div .title { font-weight:700; color:#111827; }
+            .breadcrumb-div { margin-top:6px; }
+        </style>
     </head>
 
     <body class="top-navbar-fixed">
@@ -47,7 +70,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                 </div>
 
                                 <div class="col-md-2">
-                                <a href="new.php" class="btn btn-primary">New Module</a>
+                                <a href="new.php" class="btn btn-modern">New Module</a>
                                 </div>
                             </div>
                             <div class="row breadcrumb-div">
@@ -63,7 +86,7 @@ if (strlen($_SESSION['alogin']) == "") {
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="panel">
+                                        <div class="panel modern-card">
                                             <div class="panel-heading">
                                                 <div class="row">
                                                     <div class="col-md-6">
@@ -124,6 +147,7 @@ if (strlen($_SESSION['alogin']) == "") {
         <script src="../js/main.js"></script>
         <script>
             $(document).ready(function() {
+                var userRole = <?php echo json_encode($currentRole); ?>;
                 const table = $('#moduleTable').DataTable({
                     ajax: {
                         url: 'fetch_modules.php',
@@ -144,10 +168,11 @@ if (strlen($_SESSION['alogin']) == "") {
                         {
                             data: 'id',
                             render: function(data) {
-                                return `
-                                <a href="edit.php?moduleid=${data}" class="btn btn-info btn-xs">Edit</a>
-                                <a href="?id=${data}" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
-                            `;
+                                var html = `<a href="edit.php?moduleid=${data}" class="btn btn-info btn-xs">Edit</a>`;
+                                if (userRole === 'admin') {
+                                    html += ` <a href="?id=${data}" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>`;
+                                }
+                                return html;
                             }
                         }
                     ]

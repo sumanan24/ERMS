@@ -5,27 +5,35 @@ include('../includes/config.php');
 if (strlen($_SESSION['alogin']) == "") {
     header("Location: ../index.php");
 } else {
+    $currentRole = 'admin';
+    try {
+        $u = $_SESSION['alogin'];
+        $st = $dbh->prepare("SELECT usertype FROM admin WHERE (username=:u OR UserName=:u) LIMIT 1");
+        $st->bindParam(':u', $u, PDO::PARAM_STR);
+        $st->execute();
+        $r = $st->fetch(PDO::FETCH_OBJ);
+        if ($r && isset($r->usertype)) { $currentRole = $r->usertype; }
+    } catch (Exception $e) {}
 
     // Code for Deletion
     if (isset($_GET['id'])) {
-        $examid = $_GET['id'];
-        // Check if the exam has associated results
-        $checkResultsSql = "SELECT COUNT(*) as result_count FROM results WHERE examid = :examid";
-        $checkResultsQuery = $dbh->prepare($checkResultsSql);
-        $checkResultsQuery->bindParam(':examid', $examid, PDO::PARAM_STR);
-        $checkResultsQuery->execute();
-        $resultCount = $checkResultsQuery->fetch(PDO::FETCH_OBJ)->result_count;
-
-        if ($resultCount > 0) {
-            // Show alert if results exist
-            echo '<script>alert("Cannot delete this exam as it has associated results.");</script>';
-        } else {
-            // Proceed with deletion if no results exist
-            $sql = "DELETE FROM exam WHERE id = :examid";
-            $query = $dbh->prepare($sql);
-            $query->bindParam(':examid', $examid, PDO::PARAM_STR);
-            $query->execute();
-            echo '<script>alert("Exam deleted successfully.");</script>';
+        if ($currentRole === 'user') { echo '<script>alert("You do not have permission to delete.");</script>'; } else {
+            $examid = $_GET['id'];
+            try {
+                $dbh->beginTransaction();
+                $delRes = $dbh->prepare("DELETE FROM results WHERE examid = :examid");
+                $delRes->bindParam(':examid', $examid, PDO::PARAM_STR);
+                $delRes->execute();
+                $delExam = $dbh->prepare("DELETE FROM exam WHERE id = :examid");
+                $delExam->bindParam(':examid', $examid, PDO::PARAM_STR);
+                $delExam->execute();
+                $dbh->commit();
+                echo '<script>alert("Exam and related results deleted successfully.");</script>';
+            } catch (Exception $e) {
+                $dbh->rollBack();
+                $msg = addslashes($e->getMessage());
+                echo '<script>alert("Delete failed: ' . $msg . '");</script>';
+            }
         }
     }
 
@@ -107,6 +115,15 @@ if (strlen($_SESSION['alogin']) == "") {
                 -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
                 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
             }
+            body { background: #f5f7fb; color: #111827; }
+            .modern-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 8px 18px rgba(0,0,0,0.05); overflow:hidden; }
+            .modern-card .panel-heading { background:#fff; border-bottom:1px solid #e5e7eb; padding:16px 20px; }
+            .modern-card .panel-title h5 { margin:0; font-weight:700; color:#111827; }
+            .modern-card .panel-body { padding:22px; }
+            .btn-modern { background:#2563eb; border-color:#2563eb; border-radius:10px; padding:8px 14px; font-weight:600; color:#fff; }
+            .btn-modern:hover, .btn-modern:focus { background:#1d4ed8; border-color:#1d4ed8; }
+            .page-title-div .title { font-weight:700; color:#111827; }
+            .breadcrumb-div { margin-top:6px; }
         </style>
     </head>
 
@@ -119,8 +136,11 @@ if (strlen($_SESSION['alogin']) == "") {
                     <div class="main-page">
                         <div class="container-fluid">
                             <div class="row page-title-div">
-                                <div class="col-md-6">
+                                <div class="col-md-10">
                                     <h2 class="title">Manage Exams</h2>
+                                </div>
+                                <div class="col-md-2" style="text-align:right;">
+                                    <a href="new.php" class="btn btn-modern">New Exam</a>
                                 </div>
                             </div>
                             <div class="row breadcrumb-div">
@@ -136,7 +156,7 @@ if (strlen($_SESSION['alogin']) == "") {
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="panel">
+                                        <div class="modern-card">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
                                                     <h5>Filter Exams</h5>
@@ -195,13 +215,13 @@ if (strlen($_SESSION['alogin']) == "") {
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-sm-2">
-                                                            <button type="submit" class="btn btn-primary" style="width: 100%;">Search Exam</button>
+                                                            <button type="submit" class="btn btn-modern" style="width: 100%;">Search Exam</button>
                                                         </div>
                                                     </div>
                                                 </form>
                                             </div>
                                         </div>
-                                        <div class="panel">
+                                        <div class="modern-card">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
                                                     <h5>View Exams Info</h5>
@@ -253,6 +273,9 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     <td>
                                                                     <button class="btn btn-info btn-xs" data-toggle="modal" data-target="#editExamModal" data-id="<?php echo $result->id; ?>" data-date="<?php echo $result->date; ?>" data-time="<?php echo $result->time; ?>">Edit</button>
                                                                         <a href="result.php?examid=<?php echo htmlentities($result->id); ?>" class="btn btn-primary btn-xs"> Add Result </a>
+                                                                        <?php if ($currentRole==='admin') { ?>
+                                                                            <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete this exam?')" class="btn btn-danger btn-xs">Delete</a>
+                                                                        <?php } ?>
                                                                     </td>
                                                                 </tr>
                                                         <?php
@@ -293,7 +316,7 @@ if (strlen($_SESSION['alogin']) == "") {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" name="update_exam" class="btn btn-primary">Save changes</button>
+                            <button type="submit" name="update_exam" class="btn btn-modern">Save changes</button>
                         </div>
                     </form>
                 </div>

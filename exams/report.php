@@ -61,7 +61,6 @@ if (strlen($_SESSION['alogin']) == 0) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Course and Batch Search</title>
-        <link rel="stylesheet" href="../css/bootstrap.css" media="screen">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" href="../css/bootstrap.css" media="screen">
         <link rel="stylesheet" href="../css/font-awesome.min.css" media="screen">
@@ -69,6 +68,19 @@ if (strlen($_SESSION['alogin']) == 0) {
         <link rel="stylesheet" href="../css/lobipanel/lobipanel.min.css" media="screen">
         <link rel="stylesheet" href="../css/main.css" media="screen">
         <script src="../js/modernizr/modernizr.min.js"></script>
+        <style>
+            body { background: #f5f7fb; color:#111827; }
+            .modern-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 8px 18px rgba(0,0,0,0.05); overflow:hidden; }
+            .modern-card .panel-heading { background:#fff; border-bottom:1px solid #e5e7eb; padding:16px 20px; }
+            .modern-card .panel-title h5 { margin:0; font-weight:700; color:#111827; }
+            .modern-card .panel-body { padding:22px; }
+            .btn-modern { background:#2563eb; border-color:#2563eb; border-radius:10px; padding:10px 16px; font-weight:600; color:#fff; }
+            .btn-modern:hover, .btn-modern:focus { background:#1d4ed8; border-color:#1d4ed8; }
+            label { font-size:13px; color:#6b7280; margin-bottom:6px; }
+            .form-control { height:44px; border-radius:10px; border:1px solid #e5e7eb; box-shadow:none; }
+            .form-control:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
+            .table thead th { background:#f8f9fa; }
+        </style>
     </head>
 
     <body class="top-navbar-fixed">
@@ -88,77 +100,79 @@ if (strlen($_SESSION['alogin']) == 0) {
 
                         <section class="section">
                             <div class="container-fluid">
-                                <form method="post">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="course">Course</label>
-                                                <select name="course" id="course" class="form-control" required>
-                                                    <option value="">Select Course</option>
-                                                    <?php foreach ($courses as $course): ?>
-                                                        <option value="<?php echo htmlentities($course->id); ?>"><?php echo htmlentities($course->cname); ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                <div class="panel modern-card">
+                                    <div class="panel-heading"><div class="panel-title"><h5>Exam Report</h5></div></div>
+                                    <div class="panel-body">
+                                        <form method="post">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="course">Course</label>
+                                                        <select name="course" id="course" class="form-control" required>
+                                                            <option value="">Select Course</option>
+                                                            <?php foreach ($courses as $course): ?>
+                                                                <option value="<?php echo htmlentities($course->id); ?>"><?php echo htmlentities($course->cname); ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label for="batch">Batch</label>
+                                                        <select name="batch" id="batch" class="form-control" required>
+                                                            <option value="">Select Batch</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group" style="margin-top:24px;">
+                                                        <button type="submit" name="search" class="btn btn-modern" style="width:100%;">Search</button>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </form>
 
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="batch">Batch</label>
-                                                <select name="batch" id="batch" class="form-control" required>
-                                                    <option value="">Select Batch</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <button type="submit" name="search" class="btn btn-primary">Search</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <?php if (isset($students) && count($students) > 0 && isset($modules) && count($modules) > 0): ?>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Reg No</th>
-                                                    <th>Full Name</th>
-                                                    <?php foreach ($modules as $module): ?>
-                                                        <th><?php echo htmlentities($module->mname); ?></th>
-                                                    <?php endforeach; ?>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($students as $student): ?>
-                                                    <tr>
-                                                        <td><?php echo htmlentities($student->reg_no); ?></td>
-                                                        <td><?php echo htmlentities($student->fullname); ?></td>
-                                                        <?php foreach ($modules as $module): ?>
-                                                            <td>
-                                                                <?php
-                                                                // Check if the student has marks for this module
-                                                                echo isset($marksByStudent[$student->id][$module->id]) ? htmlentities($marksByStudent[$student->id][$module->id]) : 'N/A';
-                                                                ?>
-                                                            </td>
+                                        <?php if (isset($students) && count($students) > 0 && isset($modules) && count($modules) > 0): ?>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Reg No</th>
+                                                            <th>Full Name</th>
+                                                            <?php foreach ($modules as $module): ?>
+                                                                <th><?php echo htmlentities($module->mname); ?></th>
+                                                            <?php endforeach; ?>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($students as $student): ?>
+                                                            <tr>
+                                                                <td><?php echo htmlentities($student->reg_no); ?></td>
+                                                                <td><?php echo htmlentities($student->fullname); ?></td>
+                                                                <?php foreach ($modules as $module): ?>
+                                                                    <td>
+                                                                        <?php
+                                                                        echo isset($marksByStudent[$student->id][$module->id]) ? htmlentities($marksByStudent[$student->id][$module->id]) : 'N/A';
+                                                                        ?>
+                                                                    </td>
+                                                                <?php endforeach; ?>
+                                                            </tr>
                                                         <?php endforeach; ?>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                    </tbody>
+                                                </table>
+                                            </div>
 
-                                    <!-- Excel Export -->
-                                    <form method="post" action="export_to_excel.php">
-                                        <input type="hidden" name="course" value="<?php echo $courseId; ?>">
-                                        <input type="hidden" name="batch" value="<?php echo $batchId; ?>">
-                                        <button type="submit" name="export_excel" class="btn btn-success">Export to Excel</button>
-                                    </form>
-                                <?php else: ?>
-                                    <p>No data found.</p>
-                                <?php endif; ?>
+                                            <!-- Excel Export -->
+                                            <form method="post" action="export_to_excel.php">
+                                                <input type="hidden" name="course" value="<?php echo $courseId; ?>">
+                                                <input type="hidden" name="batch" value="<?php echo $batchId; ?>">
+                                                <button type="submit" name="export_excel" class="btn btn-success">Export to Excel</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <p style="color:#6b7280;">No data found.</p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
                         </section>
                     </div>

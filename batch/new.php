@@ -13,20 +13,24 @@ if (strlen($_SESSION['alogin']) == 0) {
         $end_date = $_POST['end_date'];
         $batch_no = $_POST['batch_no'];
 
-        // Insert batch information into the database
-        $sql = "INSERT INTO batch (batch_no, start_date, end_date, cid) VALUES (:batch_no, :start_date, :end_date, :cid)";
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':batch_no', $batch_no, PDO::PARAM_STR);
-        $query->bindParam(':start_date', $start_date, PDO::PARAM_STR);
-        $query->bindParam(':end_date', $end_date, PDO::PARAM_STR);
-        $query->bindParam(':cid', $cid, PDO::PARAM_INT);
-        $query->execute();
-        $lastInsertId = $dbh->lastInsertId();
-
-        if ($lastInsertId) {
-            $msg = "Batch Created successfully";
+        if (strtotime($end_date) < strtotime($start_date)) {
+            $error = "End date cannot be before start date.";
         } else {
-            $error = "Something went wrong. Please try again";
+            // Insert batch information into the database
+            $sql = "INSERT INTO batch (batch_no, start_date, end_date, cid) VALUES (:batch_no, :start_date, :end_date, :cid)";
+            $query = $dbh->prepare($sql);
+            $query->bindParam(':batch_no', $batch_no, PDO::PARAM_STR);
+            $query->bindParam(':start_date', $start_date, PDO::PARAM_STR);
+            $query->bindParam(':end_date', $end_date, PDO::PARAM_STR);
+            $query->bindParam(':cid', $cid, PDO::PARAM_INT);
+            $query->execute();
+            $lastInsertId = $dbh->lastInsertId();
+
+            if ($lastInsertId) {
+                $msg = "Batch created successfully";
+            } else {
+                $error = "This batch has already been created.";
+            }
         }
     }
 
@@ -67,6 +71,19 @@ if (strlen($_SESSION['alogin']) == 0) {
                 border-left: 4px solid #5cb85c;
                 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
             }
+            body { background: #f5f7fb; color: #111827; }
+            .modern-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 8px 18px rgba(0,0,0,0.05); overflow:hidden; }
+            .modern-card .panel-heading { background:#fff; border-bottom:1px solid #e5e7eb; padding:16px 20px; }
+            .modern-card .panel-title h5 { margin:0; font-weight:700; color:#111827; }
+            .modern-card .panel-body { padding:22px; }
+            .form-group label { font-size:13px; color:#6b7280; margin-bottom:6px; }
+            .form-control { height:44px; border-radius:10px; border:1px solid #e5e7eb; box-shadow:none; }
+            .form-control:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.15); }
+            .btn-modern { background:#2563eb; border-color:#2563eb; border-radius:10px; padding:10px 16px; font-weight:600; color:#fff; }
+            .btn-modern:hover, .btn-modern:focus { background:#1d4ed8; border-color:#1d4ed8; }
+            .page-title-div .title { font-weight:700; color:#111827; }
+            .breadcrumb-div { margin-top:6px; }
+            @media (max-width: 767px){ .btn-block-sm { width:100%; display:block; } }
         </style>
     </head>
 
@@ -96,8 +113,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <section class="section">
                             <div class="container-fluid">
                                 <div class="row">
-                                    <div class="col-md-8 col-md-offset-2">
-                                        <div class="panel">
+                                    <div class="col-sm-12 col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3">
+                                        <div class="panel modern-card">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
                                                     <h5>Create Batch</h5>
@@ -131,7 +148,7 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="batch_no">Batch No</label>
-                                                        <input type="text" name="batch_no" id="batch_no" class="form-control" required readonly>
+                                                        <input type="number" name="batch_no" id="batch_no" class="form-control" required >
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="start_date">Start Date</label>
@@ -141,8 +158,8 @@ if (strlen($_SESSION['alogin']) == 0) {
                                                         <label for="end_date">End Date</label>
                                                         <input type="date" name="end_date" id="end_date" class="form-control" required>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <button type="submit" name="submit" class="btn btn-success">Submit</button>
+                                                    <div class="form-group" style="margin-top:16px;">
+                                                        <button type="submit" name="submit" class="btn btn-modern btn-block-sm"><i class="fa fa-save"></i> Save Batch</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -202,6 +219,17 @@ if (strlen($_SESSION['alogin']) == 0) {
                     });
                 }
             });
+        </script>
+        <script>
+            (function(){
+                var sd = document.getElementById('start_date');
+                var ed = document.getElementById('end_date');
+                function sync(){ if(!sd||!ed) return; ed.min = sd.value || ''; if (ed.value && sd.value && ed.value < sd.value) { ed.value = ''; } }
+                function syncBack(){ if(!sd||!ed) return; sd.max = ed.value || ''; if (sd.value && ed.value && sd.value > ed.value) { sd.value = ed.value; } }
+                if (sd) { sd.addEventListener('change', function(){ sync(); }); }
+                if (ed) { ed.addEventListener('change', function(){ syncBack(); }); }
+                sync(); syncBack();
+            })();
         </script>
     </body>
 

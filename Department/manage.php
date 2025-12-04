@@ -5,28 +5,40 @@ include('../includes/config.php');
 if (strlen($_SESSION['alogin']) == "") {
     header("Location: ../index.php");
 } else {
+    $currentRole = 'admin';
+    try {
+        $u = $_SESSION['alogin'];
+        $st = $dbh->prepare("SELECT usertype FROM admin WHERE (username=:u OR UserName=:u) LIMIT 1");
+        $st->bindParam(':u', $u, PDO::PARAM_STR);
+        $st->execute();
+        $r = $st->fetch(PDO::FETCH_OBJ);
+        if ($r && isset($r->usertype)) { $currentRole = $r->usertype; }
+    } catch (Exception $e) {}
 
     // Code for Deletion
     if (isset($_GET['id'])) {
-        $classid = $_GET['id'];
+        if ($currentRole !== 'admin') { echo '<script>alert("You do not have permission to delete.");</script>'; }
+        else { 
+            $classid = $_GET['id'];
 
-        // Check if department has courses
-        $checkCoursesSql = "SELECT COUNT(*) as course_count FROM course WHERE did = :classid";
-        $checkCoursesQuery = $dbh->prepare($checkCoursesSql);
-        $checkCoursesQuery->bindParam(':classid', $classid, PDO::PARAM_STR);
-        $checkCoursesQuery->execute();
-        $courseCount = $checkCoursesQuery->fetch(PDO::FETCH_OBJ)->course_count;
+            // Check if department has courses
+            $checkCoursesSql = "SELECT COUNT(*) as course_count FROM course WHERE did = :classid";
+            $checkCoursesQuery = $dbh->prepare($checkCoursesSql);
+            $checkCoursesQuery->bindParam(':classid', $classid, PDO::PARAM_STR);
+            $checkCoursesQuery->execute();
+            $courseCount = $checkCoursesQuery->fetch(PDO::FETCH_OBJ)->course_count;
 
-        if ($courseCount > 0) {
-            // Show alert if courses exist
-            echo '<script>alert("Cannot delete this department as it has associated courses.");</script>';
-        } else {
-            // Proceed with deletion if no courses exist
-            $sql = "DELETE FROM department WHERE id = :classid";
-            $query = $dbh->prepare($sql);
-            $query->bindParam(':classid', $classid, PDO::PARAM_STR);
-            $query->execute();
-            echo '<script>alert("Department deleted successfully.");</script>';
+            if ($courseCount > 0) {
+                // Show alert if courses exist
+                echo '<script>alert("Cannot delete this department as it has associated courses.");</script>';
+            } else {
+                // Proceed with deletion if no courses exist
+                $sql = "DELETE FROM department WHERE id = :classid";
+                $query = $dbh->prepare($sql);
+                $query->bindParam(':classid', $classid, PDO::PARAM_STR);
+                $query->execute();
+                echo '<script>alert("Department deleted successfully.");</script>';
+            }
         }
     }
 ?>
@@ -63,6 +75,15 @@ if (strlen($_SESSION['alogin']) == "") {
                 -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
                 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
             }
+            body { background: #f5f7fb; color: #111827; }
+            .modern-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; box-shadow:0 8px 18px rgba(0,0,0,0.05); overflow:hidden; }
+            .modern-card .panel-heading { background:#fff; border-bottom:1px solid #e5e7eb; padding:16px 20px; }
+            .modern-card .panel-title h5 { margin:0; font-weight:700; color:#111827; }
+            .modern-card .panel-body { padding:22px; }
+            .btn-modern { background:#2563eb; border-color:#2563eb; border-radius:10px; padding:8px 14px; font-weight:600; color:#fff; }
+            .btn-modern:hover, .btn-modern:focus { background:#1d4ed8; border-color:#1d4ed8; }
+            .page-title-div .title { font-weight:700; color:#111827; }
+            .breadcrumb-div { margin-top:6px; }
         </style>
     </head>
 
@@ -81,9 +102,10 @@ if (strlen($_SESSION['alogin']) == "") {
                                     <h2 class="title">Manage Departments</h2>
                                 </div>
                                 <div class="col-md-2">
-                                <a href="new.php" class="btn btn-primary">New Department</a>
+                                <a href="new.php" class="btn btn-modern">New Department</a>
                                 </div>
                             </div>
+
                             <div class="row breadcrumb-div">
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
@@ -97,7 +119,7 @@ if (strlen($_SESSION['alogin']) == "") {
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="panel">
+                                        <div class="panel modern-card">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
                                                     <h5>View Departments Info</h5>
@@ -113,6 +135,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                             <?php } ?>
                                             <div class="panel-body p-20">
                                                 <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
+
                                                     <thead>
                                                         <tr>
                                                             <th>Department Name</th>
@@ -138,8 +161,11 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     <td><?php echo htmlentities($result->dname); ?></td>
                                                                     <td>
                                                                         <a href="edit.php?classid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Edit </a>
-                                                                        <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
+                                                                        <?php if ($currentRole==='admin') { ?>
+                                                                            <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
+                                                                        <?php } ?>
                                                                     </td>
+
                                                                 </tr>
                                                         <?php $cnt = $cnt + 1;
                                                             }
