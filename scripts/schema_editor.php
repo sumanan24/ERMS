@@ -1,22 +1,5 @@
 <?php
-session_start();
 require_once __DIR__ . '/../includes/config.php';
-$role = 'user';
-$user = isset($_SESSION['alogin']) ? $_SESSION['alogin'] : '';
-$usertypeColumnMissing = false;
-if ($user) {
-    try {
-        $st = $dbh->prepare("SELECT usertype FROM admin WHERE username=:u LIMIT 1");
-        $st->bindParam(':u', $user, PDO::PARAM_STR);
-        $st->execute();
-        $ut = $st->fetch(PDO::FETCH_OBJ);
-        if ($ut && isset($ut->usertype)) { $role = $ut->usertype; }
-    } catch (Exception $e) {
-        $usertypeColumnMissing = true;
-        $role = 'admin';
-    }
-}
-if (!$user) { header('Location: ../index.php'); exit; }
 $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $schemaStmt = $dbh->query('SELECT DATABASE() as db');
 $schemaRow = $schemaStmt->fetch(PDO::FETCH_OBJ);
