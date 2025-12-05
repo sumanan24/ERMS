@@ -156,6 +156,9 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     <td><?php echo htmlentities($result->dname); ?></td>
                                                                     <td>
                                                                         <a href="edit.php?courseid=<?php echo htmlentities($result->id); ?>" class="btn btn-info btn-xs"> Edit </a>
+                                                                    <?php if ($currentRole==='admin') { ?>
+                                                                        <a href="?id=<?php echo $result->id; ?>" onClick="return confirm('Are you sure you want to delete?')" class="btn btn-danger btn-xs">Delete</a>
+                                                                    <?php } ?>
                                                                     </td>
 
                                                                 </tr>
