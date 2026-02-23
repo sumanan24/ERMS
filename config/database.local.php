@@ -1,5 +1,5 @@
 <?php
 define('DB_HOST', 'localhost');
-define('DB_USER', 'examucj_srms');
-define('DB_PASS', '^?DcTc*AZE$EYoee');
-define('DB_NAME', 'examucj_exam_management');
+define('DB_USER', 'root');
+define('DB_PASS', '1234');
+define('DB_NAME', 'exam_management');
