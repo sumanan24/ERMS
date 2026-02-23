@@ -25,12 +25,9 @@ A complete PHP MVC-based Exam Result Management System with user authentication 
 1. **Extract files** to your web server directory (e.g., `C:\wamp64\www\exam`)
 
 2. **Configure Database** (if needed):
-   - Edit `config/database.php` to match your MySQL credentials
-   - Default settings:
-     - Host: localhost
-     - Username: root
-     - Password: (empty)
-     - Database: exam_management (will be created automatically)
+   - **Local:** Edit `config/database.php` or copy `config/database.local.php.example` to `config/database.local.php` and set your credentials.
+   - **Production (e.g. exam.ucj.ac.lk):** Either set environment variables `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, or create `config/database.local.php` (do not commit it) with `$db_host`, `$db_name`, `$db_user`, `$db_pass`.
+   - Default settings: Host: localhost, Database: exam_management, User: root, Password: (as in config).
 
 3. **Run Installation**:
    - Open your browser and navigate to: `http://localhost/exam/install.php`

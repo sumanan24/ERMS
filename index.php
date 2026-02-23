@@ -9,6 +9,14 @@ session_start();
 // Define base path
 define('BASE_PATH', __DIR__);
 
+// Fail fast if database is unavailable (prevents HTTP 500 from null connection)
+require_once __DIR__ . '/config/database.php';
+$__db = new Database();
+if (!$__db->getDbConnection()) {
+    require_once __DIR__ . '/views/maintenance.php';
+    exit;
+}
+
 // Autoload classes
 spl_autoload_register(function ($class) {
     $paths = [
