@@ -13,6 +13,7 @@ define('BASE_PATH', __DIR__);
 require_once __DIR__ . '/config/database.php';
 $__db = new Database();
 if (!$__db->getDbConnection()) {
+    $db_error = (isset($_GET['debug']) && $_GET['debug'] === '1') ? Database::$lastError : null;
     require_once __DIR__ . '/views/maintenance.php';
     exit;
 }

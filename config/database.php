@@ -12,6 +12,9 @@ class Database {
     private $password;
     private $conn;
 
+    /** Last connection error message (for optional debug display). */
+    public static $lastError;
+
     public function __construct() {
         if (file_exists(__DIR__ . '/database.local.php')) {
             require __DIR__ . '/database.local.php';
@@ -33,6 +36,7 @@ class Database {
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $e) {
+            self::$lastError = $e->getMessage();
             error_log("Database Connection Error: " . $e->getMessage());
             return null;
         }
@@ -42,7 +46,7 @@ class Database {
 
     public function getDbConnection() {
         $this->conn = null;
-        
+        self::$lastError = null;
         try {
             $this->conn = new PDO(
                 "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
@@ -51,6 +55,7 @@ class Database {
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $e) {
+            self::$lastError = $e->getMessage();
             error_log("Database Connection Error: " . $e->getMessage());
             return null;
         }

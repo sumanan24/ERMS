@@ -34,6 +34,10 @@
         <h1>Site temporarily unavailable</h1>
         <p>This page isn't able to handle your request right now. Please try again in a few minutes.</p>
         <p style="margin-top: 1rem; font-size: 0.9rem;">If the problem continues, contact your system administrator.</p>
+        <?php if (!empty($db_error)): ?>
+        <p style="margin-top: 1rem; padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 6px; font-size: 0.85rem; word-break: break-all;">Database: <?php echo htmlspecialchars($db_error); ?></p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.8;">Remove <code>?debug=1</code> from the URL after fixing.</p>
+        <?php endif; ?>
     </div>
 </body>
 </html>
