@@ -1,0 +1,62 @@
+/* Global Full Screen Scrolling Styles */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Main Content Area - Full Screen Scrolling */
+.main-content {
+    min-height: calc(100vh - 70px);
+    min-height: calc(100dvh - 70px);
+    height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar for Main Content */
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* Firefox Scrollbar */
+.main-content {
+    scrollbar-width: thin;
+    scrollbar-color: #667eea #f1f1f1;
+}
+
+
+
+
+
+
+
+
+
+
+

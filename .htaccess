@@ -1,0 +1,19 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Handle adminlogin route
+RewriteRule ^adminlogin$ index.php?action=adminlogin [L,QSA]
+
+# Redirect to index.php if file doesn't exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Security: Prevent directory listing
+Options -Indexes
+
+# Security: Protect sensitive files
+<FilesMatch "\.(sql|log|ini)$">
+    Require all denied
+</FilesMatch>
+
