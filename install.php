@@ -19,6 +19,9 @@ try {
             $message = "Installation completed successfully! You can now login with username: admin and password: admin123";
         } else {
             $message = "Installation failed. Please check your database configuration and ensure MySQL is running.";
+            if (!empty($install->lastError)) {
+                $message .= " Error: " . htmlspecialchars($install->lastError);
+            }
         }
     }
 } catch (Exception $e) {

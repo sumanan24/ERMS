@@ -3,29 +3,47 @@ require_once __DIR__ . '/database.php';
 
 class Install {
     private $db;
+    private $dbName;
+
+    /** Last error message for display on install page. */
+    public $lastError = '';
 
     public function __construct() {
         $database = new Database();
+        $this->dbName = $database->getDbName();
         $this->db = $database->getConnection();
         if ($this->db === null) {
-            throw new Exception("Failed to connect to MySQL server. Please check your database configuration in config/database.php");
+            throw new Exception("Failed to connect to MySQL server. Check config/database.php (host, username, password) and ensure MySQL is running.");
         }
     }
 
     public function createDatabase() {
         try {
-            $sql = "CREATE DATABASE IF NOT EXISTS exam_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+            $name = $this->dbName;
+            $sql = "CREATE DATABASE IF NOT EXISTS `" . str_replace('`', '``', $name) . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
             $this->db->exec($sql);
             return true;
         } catch(PDOException $e) {
-            error_log("Error creating database: " . $e->getMessage());
+            $this->lastError = $e->getMessage();
+            error_log("Install createDatabase: " . $e->getMessage());
             return false;
         }
     }
 
+    /** Use existing database connection (when CREATE DATABASE not allowed, e.g. shared hosting). */
+    public function useExistingDatabase() {
+        $database = new Database();
+        $this->db = $database->getDbConnection();
+        if ($this->db === null) {
+            $this->lastError = 'Could not connect to database "' . $this->dbName . '". Create it in cPanel/phpMyAdmin and ensure the user has access.';
+            return false;
+        }
+        return true;
+    }
+
     public function createTables() {
         try {
-            $this->db->exec("USE exam_management");
+            $this->db->exec("USE `" . str_replace('`', '``', $this->dbName) . "`");
 
             // Users table
             $sql_users = "CREATE TABLE IF NOT EXISTS users (
@@ -162,6 +180,7 @@ class Install {
 
             return true;
         } catch(PDOException $e) {
+            $this->lastError = $e->getMessage();
             error_log("Error creating tables: " . $e->getMessage());
             return false;
         }
@@ -169,7 +188,7 @@ class Install {
 
     public function createDefaultAdmin() {
         try {
-            $this->db->exec("USE exam_management");
+            $this->db->exec("USE `" . str_replace('`', '``', $this->dbName) . "`");
 
             // Check if admin already exists
             $check = $this->db->prepare("SELECT COUNT(*) FROM users WHERE role = 'admin'");
@@ -189,6 +208,7 @@ class Install {
 
             return true;
         } catch(PDOException $e) {
+            $this->lastError = $e->getMessage();
             error_log("Error creating default admin: " . $e->getMessage());
             return false;
         }
@@ -196,7 +216,10 @@ class Install {
 
     public function install() {
         if (!$this->createDatabase()) {
-            return false;
+            // e.g. shared hosting: user cannot CREATE DATABASE; use existing DB
+            if (!$this->useExistingDatabase()) {
+                return false;
+            }
         }
 
         if (!$this->createTables()) {

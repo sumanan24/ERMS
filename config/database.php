@@ -24,6 +24,11 @@ class Database {
         return $this->conn;
     }
 
+    /** Database name (for installer). */
+    public function getDbName() {
+        return $this->db_name;
+    }
+
     public function getDbConnection() {
         $this->conn = null;
         
