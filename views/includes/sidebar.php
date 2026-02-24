@@ -2,8 +2,19 @@
 $current_action = $_GET['action'] ?? 'dashboard';
 $user_role = $_SESSION['role'] ?? 'student';
 $user_name = $_SESSION['full_name'] ?? 'User';
+if (!defined('LAYOUT_HTML_STARTED')) {
+    define('LAYOUT_HTML_STARTED', true);
 ?>
-<?php require_once __DIR__ . '/bootstrap.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERMS - Exam Result Management</title>
+    <?php require_once __DIR__ . '/bootstrap.php'; ?>
+</head>
+<body>
+<?php } ?>
 
 <style>
     /* Global Full Screen Scrolling */

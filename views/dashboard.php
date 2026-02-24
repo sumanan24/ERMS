@@ -64,6 +64,11 @@ function getExamsByMonth($conn) {
 
 $db = new Database();
 $conn = $db->getDbConnection();
+if (!$conn) {
+    echo '<p style="padding:20px;color:#c00;">Database connection failed. Please try again later.</p>';
+    if (defined('LAYOUT_HTML_STARTED')) { require_once __DIR__ . '/includes/footer.php'; }
+    return;
+}
 
 $counts = [
     'students' => getTableCount($conn, 'student'),
@@ -535,3 +540,4 @@ new Chart(distributionCtx, {
     }
 });
 </script>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
