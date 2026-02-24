@@ -93,7 +93,7 @@ switch ($action) {
                 header("Location: index.php?action=dashboard");
                 exit();
             }
-            require_once 'views/login.php';
+            require_once __DIR__ . '/views/login.php';
         }
         break;
 
@@ -105,7 +105,7 @@ switch ($action) {
     case 'dashboard':
         $authController = new AuthController();
         $authController->requireLogin();
-        require_once 'views/dashboard.php';
+        require_once __DIR__ . '/views/dashboard.php';
         break;
 
     case 'profile':
