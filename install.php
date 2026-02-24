@@ -23,6 +23,17 @@ try {
                 $message .= " Error: " . htmlspecialchars($install->lastError);
             }
         }
+    } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['import_sql'])) {
+        $sqlFile = __DIR__ . '/exam_management.sql';
+        if ($install->importSqlFile($sqlFile)) {
+            $success = true;
+            $message = "Database imported successfully from exam_management.sql! You can now login (use the admin user from the SQL file, or run Install for a fresh admin).";
+        } else {
+            $message = "Import failed.";
+            if (!empty($install->lastError)) {
+                $message .= " " . htmlspecialchars($install->lastError);
+            }
+        }
     }
 } catch (Exception $e) {
     error_log("Installation Error: " . $e->getMessage());
@@ -291,8 +302,14 @@ try {
                 <strong>Note:</strong> Make sure your MySQL server is running and the database user has proper permissions.
             </div>
 
+            <form method="POST" style="margin-bottom: 15px;">
+                <button type="submit" name="install" class="btn-install">Install Now (fresh setup)</button>
+            </form>
+
+            <p style="text-align: center; color: #666; margin: 10px 0; font-size: 14px;">— or import existing backup —</p>
+
             <form method="POST">
-                <button type="submit" name="install" class="btn-install">Install Now</button>
+                <button type="submit" name="import_sql" class="btn-install" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">Import exam_management.sql</button>
             </form>
 
             <div class="back-link">

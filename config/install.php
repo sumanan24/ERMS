@@ -232,6 +232,58 @@ class Install {
 
         return true;
     }
+
+    /**
+     * Import database from exam_management.sql (or any .sql file).
+     * Creates database if needed, then runs all statements in the file.
+     */
+    public function importSqlFile($filePath) {
+        $this->lastError = '';
+        if (!is_readable($filePath)) {
+            $this->lastError = "SQL file not found or not readable: " . basename($filePath);
+            return false;
+        }
+        if (!$this->createDatabase()) {
+            if (!$this->useExistingDatabase()) {
+                return false;
+            }
+        }
+        try {
+            $this->db->exec("USE `" . str_replace('`', '``', $this->dbName) . "`");
+        } catch (PDOException $e) {
+            $this->lastError = $e->getMessage();
+            return false;
+        }
+        $sql = file_get_contents($filePath);
+        if ($sql === false) {
+            $this->lastError = "Could not read SQL file.";
+            return false;
+        }
+        // Remove SQL comments (-- and /* */)
+        $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
+        $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+        // Split into statements by semicolon followed by newline
+        $statements = array_filter(
+            array_map('trim', preg_split('/;\s*[\r\n]+/', $sql)),
+            function ($s) {
+                $s = trim($s);
+                if ($s === '') return false;
+                if (preg_match('/^(START\s+TRANSACTION|COMMIT|BEGIN)\s*$/i', $s)) return false;
+                return true;
+            }
+        );
+        foreach ($statements as $stmt) {
+            if (strlen($stmt) < 3) continue;
+            try {
+                $this->db->exec($stmt);
+            } catch (PDOException $e) {
+                $this->lastError = $e->getMessage() . " (in statement: " . substr($stmt, 0, 80) . "...)";
+                error_log("Import SQL error: " . $e->getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
 }
 ?>
 
