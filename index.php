@@ -4,10 +4,20 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
+// Prevent white screen on redirect: buffer output so headers can be sent
+ob_start();
+
 session_start();
 
 // Define base path
 define('BASE_PATH', __DIR__);
+
+// Base URL for redirects (works on server/subdir) - no trailing slash
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$dir = dirname($_SERVER['SCRIPT_NAME'] ?? '/');
+$dir = ($dir === '/' || $dir === '\\') ? '' : $dir;
+define('BASE_URL', $protocol . '://' . $host . rtrim(str_replace('\\', '/', $dir), '/'));
 
 // Autoload classes
 spl_autoload_register(function ($class) {
@@ -90,7 +100,8 @@ switch ($action) {
         } else {
             // Check if already logged in
             if (isset($_SESSION['user_id'])) {
-                header("Location: index.php?action=dashboard");
+                if (ob_get_level()) ob_end_clean();
+                header("Location: " . (defined('BASE_URL') ? BASE_URL . '/index.php?action=dashboard' : 'index.php?action=dashboard'));
                 exit();
             }
             require_once __DIR__ . '/views/login.php';
@@ -399,7 +410,8 @@ switch ($action) {
         break;
 
     default:
-        header("Location: index.php?action=login");
+        if (ob_get_level()) ob_end_clean();
+        header("Location: " . (defined('BASE_URL') ? BASE_URL . '/index.php?action=login' : 'index.php?action=login'));
         exit();
 }
 ?>
